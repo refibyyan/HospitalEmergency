@@ -194,8 +194,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4288782753
-  m_fontColor: {r: 0.6313726, g: 0.6313726, b: 0.6313726, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -385,9 +385,11 @@ MonoBehaviour:
   bgSprite1: {fileID: 21300000, guid: aa38fc060d9d61f498ebb3bfaef554ae, type: 3}
   textContent1: Loading . . .
   audioPart1: {fileID: 0}
-  audioPart2: {fileID: 8300000, guid: f4409f16eef8df440868e11fe15909a1, type: 3}
-  bgSprite3: {fileID: 21300000, guid: 75c66d7b10c8dfa40962de1a52e66478, type: 3}
-  textContent3: Loading . . .
+  audioPart2: {fileID: 0}
+  bgSprite3: {fileID: 0}
+  textContent3: 'Loading . . .
+
+'
   audioPart3: {fileID: 0}
   fadeDuration: 2.5
 --- !u!4 &836709464

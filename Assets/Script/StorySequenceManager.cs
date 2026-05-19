@@ -88,11 +88,10 @@ public class StorySequenceManager : MonoBehaviour
         // ----------------------------------------------------------------
         backgroundImage.sprite = bgSprite3;
         backgroundImage.gameObject.SetActive(true);
+        storyText.gameObject.SetActive(true);
 
         // Fade In Kembali (Hitam ke Terang)
         yield return StartCoroutine(Fade(1, 0));
-
-        storyText.gameObject.SetActive(true);
 
         if (audioPart3 != null) audioSource.PlayOneShot(audioPart3);
         

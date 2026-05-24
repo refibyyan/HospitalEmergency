@@ -1,121 +1,264 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Ditambahkan agar bisa membaca komponen TextMeshPro untuk countdown detiknya
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class MekanikDecision : MonoBehaviour
 {
-    [Header("Object UI di Hierarchy")]
-    public Image cardKiriUI;   // Tarik object cardKiri dari Hierarchy ke sini
-    public Image cardKananUI;  // Tarik object cardKanan dari Hierarchy ke sini
+    [Header("Object UI Decision")]
+    public Image cardKiriUI;
+    public Image cardKananUI;
 
-    [Header("Aset Gambar Kiri (Sprite)")]
-    public Sprite gambarKiriIjo;   // Gambar Kiri yang ada border + panah ijo
-    public Sprite gambarKiriPolos; // Gambar Kiri yang POLOS
+    [Header("Sprite Card Kiri")]
+    public Sprite gambarKiriIjo;
+    public Sprite gambarKiriPolos;
 
-    [Header("Aset Gambar Kanan (Sprite)")]
-    public Sprite gambarKananIjo;   // Gambar Kanan yang ada border + panah ijo
-    public Sprite gambarKananPolos; // Gambar Kanan yang POLOS
+    [Header("Sprite Card Kanan")]
+    public Sprite gambarKananIjo;
+    public Sprite gambarKananPolos;
 
-    // ==========================================
-    // TAMBAHAN FUNGSI YANG DIBUTUHKAN (TIMER)
-    // ==========================================
-    [Header("Sistem Waktu / Timer Bar")]
-    public Image barMerahTimer;       // Tarik objek TimerRed ke sini
-    public TMP_Text teksCountdown;    // Tarik objek TeksWaktu ke sini
-    public float waktuMaksimal = 15f; // Durasi waktu berpikir dalam detik
+    [Header("Timer")]
+    public Image barMerahTimer;
+    public TMP_Text teksCountdown;
+    public float waktuMaksimal = 15f;
+
     private float waktuBerjalan;
-    // ==========================================
+
+    [Header("Popup")]
+    public GameObject winPanel;
+    public GameObject gameOverPanel;
+
+    [Header("Button Game Over")]
+    public Sprite restartIjo;
+    public Sprite restartPolos;
+    public Sprite exitIjo;
+    public Sprite exitPolos;
+
+    [Header("Text Game Over")]
+    public TMP_Text restartText;
+    public TMP_Text exitText;
+
+    private Image buttonRestartUI;
+    private Image buttonExitUI;
 
     private bool pilihKiri = true;
+    private bool gameSelesai = false;
+    private bool isGameOverActive = false;
+    private bool pilihRestart = true;
 
     void Start()
     {
-        // Pas awal mulai, langsung atur tampilan awal (kiri ijo, kanan polos)
-        AturGambarPilihan();
-
-        // TAMBAHAN: Set waktu berjalan sesuai waktu maksimal saat game dimulai
         waktuBerjalan = waktuMaksimal;
-        if (barMerahTimer != null) barMerahTimer.fillAmount = 1f;
+        pilihKiri = true;
+        gameSelesai = false;
+
+        if (winPanel != null)
+            winPanel.SetActive(false);
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
+        if (barMerahTimer != null)
+            barMerahTimer.fillAmount = 1f;
+
+        UpdatePilihanCard();
     }
 
     void Update()
     {
-        // ==========================================
-        // TAMBAHAN: LOGIKA COUNTDOWN TIMER
-        // ==========================================
+        // kalau game over aktif
+        if (isGameOverActive)
+        {
+            NavigasiGameOver();
+            return;
+        }
+
+        // kalau game selesai stop
+        if (gameSelesai)
+            return;
+
+        UpdateTimer();
+        InputPilihan();
+    }
+
+    void UpdateTimer()
+    {
         if (waktuBerjalan > 0)
         {
-            waktuBerjalan -= Time.deltaTime; // Kurangi waktu setiap detik
+            waktuBerjalan -= Time.deltaTime;
 
-            // Update visual bar merah (mengubah nilai Fill Amount dari 1 menuju 0)
+            // biar ga minus
+            if (waktuBerjalan < 0)
+                waktuBerjalan = 0;
+
+            // update timer bar
             if (barMerahTimer != null)
-            {
                 barMerahTimer.fillAmount = waktuBerjalan / waktuMaksimal;
-            }
 
-            // Update teks angka detiknya (dibulatkan ke atas jadi angka utuh)
+            // update countdown text
             if (teksCountdown != null)
-            {
                 teksCountdown.text = Mathf.CeilToInt(waktuBerjalan).ToString();
-            }
         }
         else
         {
-            // Panggil fungsi tambahan jika waktu habis dan player belum memilih
-            WaktuHabisBatalMilih();
-        }
-        // ==========================================
-
-        // Deteksi tombol kiri / A (Bawaan asli kamu, tidak disentuh)
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-        {
-            pilihKiri = true;
-            AturGambarPilihan();
-        }
-        // Deteksi tombol kanan / D (Bawaan asli kamu, tidak disentuh)
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-        {
-            pilihKiri = false;
-            AturGambarPilihan();
-        }
-
-        // Eksekusi kalau pencet Enter / Space (Bawaan asli kamu, tidak disentuh)
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
-        {
-            if (pilihKiri)
+            // langsung game over otomatis
+            if (!isGameOverActive)
             {
-                Debug.Log("Memilih: GIVE FIRST AID");
-            }
-            else
-            {
-                Debug.Log("Memilih: RUSH TO THE ER");
+                WaktuHabis();
             }
         }
     }
 
-    void AturGambarPilihan() // (Bawaan asli kamu, tidak disentuh)
+    void InputPilihan()
     {
-        if (pilihKiri == true)
+        // pindah kiri
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            // Kiri pakai yang ijo, Kanan pakai yang polos
+            pilihKiri = true;
+            UpdatePilihanCard();
+        }
+
+        // pindah kanan
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            pilihKiri = false;
+            UpdatePilihanCard();
+        }
+
+        // enter = menang
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            Menang();
+        }
+    }
+
+    void UpdatePilihanCard()
+    {
+        if (pilihKiri)
+        {
             cardKiriUI.sprite = gambarKiriIjo;
             cardKananUI.sprite = gambarKananPolos;
         }
         else
         {
-            // Kiri pakai yang polos, Kanan pakai yang ijo
             cardKiriUI.sprite = gambarKiriPolos;
             cardKananUI.sprite = gambarKananIjo;
         }
     }
 
-    // ==========================================
-    // TAMBAHAN: FUNGSI OTOMATIS JIKA WAKTU HABIS
-    // ==========================================
-    void WaktuHabisBatalMilih()
+    void Menang()
     {
-        Debug.Log("WAKTU HABIS! Player gagal memilih tindakan tepat waktu!");
-        // Kamu bisa taruh efek game over atau panel close di sini nanti
-        enabled = false; // Mematikan script agar tidak looping error waktu habis
+        // biar ga dipanggil berkali-kali
+        if (gameSelesai)
+            return;
+
+        gameSelesai = true;
+
+        // munculin popup menang
+        if (winPanel != null)
+            winPanel.SetActive(true);
+
+        // pause game
+        Time.timeScale = 0f;
+    }
+
+    void WaktuHabis()
+    {
+        TriggerGameOver();
+    }
+
+    void TriggerGameOver()
+    {
+        // biar ga dipanggil berkali-kali
+        if (isGameOverActive)
+            return;
+
+        isGameOverActive = true;
+
+        // munculin popup
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        // cari button
+        Transform restart = gameOverPanel.transform.Find("restart");
+        Transform exit = gameOverPanel.transform.Find("exit");
+
+        // ambil image
+        if (restart != null)
+            buttonRestartUI = restart.GetComponent<Image>();
+
+        if (exit != null)
+            buttonExitUI = exit.GetComponent<Image>();
+
+        // default pilih restart
+        pilihRestart = true;
+
+        UpdateGameOverButton();
+
+        // pause game
+        Time.timeScale = 0f;
+    }
+
+    void NavigasiGameOver()
+    {
+        // pilih restart
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            pilihRestart = true;
+            UpdateGameOverButton();
+        }
+
+        // pilih exit
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            pilihRestart = false;
+            UpdateGameOverButton();
+        }
+
+        // enter / spasi
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            if (pilihRestart)
+            {
+                Time.timeScale = 1f;
+
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+            else
+            {
+                Application.Quit();
+
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#endif
+            }
+        }
+    }
+
+    void UpdateGameOverButton()
+    {
+        if (buttonRestartUI == null || buttonExitUI == null)
+            return;
+
+        if (pilihRestart)
+        {
+            // border ijo restart
+            buttonRestartUI.sprite = restartIjo;
+            buttonExitUI.sprite = exitPolos;
+
+            // warna text
+            restartText.color = new Color32(125, 185, 171, 255);
+            exitText.color = new Color32(120, 120, 120, 255);
+        }
+        else
+        {
+            // border ijo exit
+            buttonRestartUI.sprite = restartPolos;
+            buttonExitUI.sprite = exitIjo;
+
+            // warna text
+            restartText.color = new Color32(120, 120, 120, 255);
+            exitText.color = new Color32(125, 185, 171, 255);
+        }
     }
 }

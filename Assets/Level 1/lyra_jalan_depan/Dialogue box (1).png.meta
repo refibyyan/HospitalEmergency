@@ -1,10 +1,7 @@
 fileFormatVersion: 2
-guid: 66fd6293a8d2db04091cb60bd352154e
+guid: b8a471b35d62ab74db4be260518d9e30
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: 8641273228748992346
-    second: Char_Doctor_Right_0
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Char_Doctor_Right_0
+      name: Dialogue box (1)_0
       rect:
         serializedVersion: 2
-        x: 172
-        y: 69
-        width: 176
-        height: 393
+        x: 0
+        y: 0
+        width: 1278
+        height: 240
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +151,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a5f2da6d738fbe770800000000000000
-      internalID: 8641273228748992346
+      spriteID: 4b2026ef840772140800000000000000
+      internalID: 4694844595364823732
       vertices: []
       indices: 
       edges: []
@@ -174,7 +171,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Char_Doctor_Right_0: 8641273228748992346
+      Dialogue box (1)_0: 4694844595364823732
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

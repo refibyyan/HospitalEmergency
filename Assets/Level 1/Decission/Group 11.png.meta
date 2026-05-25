@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 66fd6293a8d2db04091cb60bd352154e
+guid: 08a98d27838d38340b95ad9c53f8eac1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8641273228748992346
-    second: Char_Doctor_Right_0
+      213: 4728393952403248342
+    second: Group 11_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Char_Doctor_Right_0
+      name: Group 11_0
       rect:
         serializedVersion: 2
-        x: 172
-        y: 69
-        width: 176
-        height: 393
+        x: 0
+        y: 0
+        width: 668
+        height: 745
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a5f2da6d738fbe770800000000000000
-      internalID: 8641273228748992346
+      spriteID: 6d4d9136f31ae9140800000000000000
+      internalID: 4728393952403248342
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Char_Doctor_Right_0: 8641273228748992346
+      Group 11_0: 4728393952403248342
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

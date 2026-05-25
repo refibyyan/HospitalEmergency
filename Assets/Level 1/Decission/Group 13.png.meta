@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 66fd6293a8d2db04091cb60bd352154e
+guid: 1bb0e1f910411e041b8a3e835adbe2a3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8641273228748992346
-    second: Char_Doctor_Right_0
+      213: 4031564604880626460
+    second: Group 13_0
+  - first:
+      213: -8464749129216593372
+    second: Group 13_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -127,7 +130,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -139,13 +142,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Char_Doctor_Right_0
+      name: Group 13_0
       rect:
         serializedVersion: 2
-        x: 172
-        y: 69
-        width: 176
-        height: 393
+        x: 0
+        y: 398
+        width: 26
+        height: 47
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +157,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a5f2da6d738fbe770800000000000000
-      internalID: 8641273228748992346
+      spriteID: c13a2f2e5aef2f730800000000000000
+      internalID: 4031564604880626460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Group 13_1
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 492
+        height: 472
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4227f30e38b278a80800000000000000
+      internalID: -8464749129216593372
       vertices: []
       indices: 
       edges: []
@@ -164,7 +189,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +199,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Char_Doctor_Right_0: 8641273228748992346
+      Group 13_0: 4031564604880626460
+      Group 13_1: -8464749129216593372
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

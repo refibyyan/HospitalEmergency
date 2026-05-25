@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 66fd6293a8d2db04091cb60bd352154e
+guid: b80b254dce7b6894c98415fd4fa09815
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8641273228748992346
-    second: Char_Doctor_Right_0
+      213: 3833541192114921883
+    second: Decision_BG_0
+  - first:
+      213: -2703199536331307393
+    second: Decision_BG_1
+  - first:
+      213: -2282979271595664421
+    second: Decision_BG_2
+  - first:
+      213: 7387864427628465225
+    second: Decision_BG_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +46,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +55,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +84,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -127,7 +136,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -139,13 +148,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Char_Doctor_Right_0
+      name: Decision_BG_0
       rect:
         serializedVersion: 2
-        x: 172
-        y: 69
-        width: 176
-        height: 393
+        x: 0
+        y: 848
+        width: 1536
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +163,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a5f2da6d738fbe770800000000000000
-      internalID: 8641273228748992346
+      spriteID: b9166db3769733530800000000000000
+      internalID: 3833541192114921883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Decision_BG_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1513
+        height: 870
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f76c8f7085e4c7ad0800000000000000
+      internalID: -2703199536331307393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Decision_BG_2
+      rect:
+        serializedVersion: 2
+        x: 994
+        y: 864
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdbd5feb27a3150e0800000000000000
+      internalID: -2282979271595664421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Decision_BG_3
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 862
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94c0a89ed87f68660800000000000000
+      internalID: 7387864427628465225
       vertices: []
       indices: 
       edges: []
@@ -164,7 +239,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +249,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Char_Doctor_Right_0: 8641273228748992346
+      Decision_BG_0: 3833541192114921883
+      Decision_BG_1: -2703199536331307393
+      Decision_BG_2: -2282979271595664421
+      Decision_BG_3: 7387864427628465225
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

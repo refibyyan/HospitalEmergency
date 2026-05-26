@@ -690,7 +690,7 @@ MonoBehaviour:
   gambarKananPolos: {fileID: 1329003711367981555, guid: 9dc241f640f5a854ab252b16b8b2d2e2, type: 3}
   barMerahTimer: {fileID: 1954247138}
   teksCountdown: {fileID: 1799343927}
-  waktuMaksimal: 15
+  waktuMaksimal: 2
   winPanel: {fileID: 790272435}
   gameOverPanel: {fileID: 74958326}
   restartIjo: {fileID: 0}
@@ -4922,7 +4922,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7e8f80e74d2628549bc176a07de88d95, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ea85673719c36244a8b7abb147a29a08, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6374,7 +6374,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1248844607}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -6511,7 +6511,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1269924822}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -11350,7 +11350,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7e8f80e74d2628549bc176a07de88d95, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a8149bf91c3584e4bbda98875f35be80, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

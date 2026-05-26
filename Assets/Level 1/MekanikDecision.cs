@@ -169,33 +169,22 @@ public class MekanikDecision : MonoBehaviour
 
     void TriggerGameOver()
     {
-        // biar ga dipanggil berkali-kali
         if (isGameOverActive)
             return;
 
+        Debug.Log("GAME OVER DIPANGGIL");
+
         isGameOverActive = true;
 
-        // munculin popup
+        // matiin panel decision biar gak nutupin
+        gameObject.SetActive(false);
+
         if (gameOverPanel != null)
+        {
+            Debug.Log("AKTIFKAN GAME OVER PANEL");
             gameOverPanel.SetActive(true);
+        }
 
-        // cari button
-        Transform restart = gameOverPanel.transform.Find("restart");
-        Transform exit = gameOverPanel.transform.Find("exit");
-
-        // ambil image
-        if (restart != null)
-            buttonRestartUI = restart.GetComponent<Image>();
-
-        if (exit != null)
-            buttonExitUI = exit.GetComponent<Image>();
-
-        // default pilih restart
-        pilihRestart = true;
-
-        UpdateGameOverButton();
-
-        // pause game
         Time.timeScale = 0f;
     }
 

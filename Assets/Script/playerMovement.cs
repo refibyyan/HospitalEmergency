@@ -1,71 +1,89 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
 
+    [Header("References")]
+    public ESP32Input espInput;
+
     private Rigidbody2D rb;
-
-    private Vector2 moveInput;
-
     private Animator animator;
+    private Vector2 moveInput;
 
     public bool canMove = true;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-
+        rb       = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+
+        if (espInput == null)
+            Debug.LogWarning("[PlayerMovement] espInput BELUM di-assign di Inspector!");
     }
 
     void Update()
     {
-        // freeze movement
         if (!canMove)
         {
-            rb.linearVelocity = Vector2.zero;
-
-            animator.SetBool("isWalking", false);
-
+            moveInput = Vector2.zero;
+            UpdateAnimator();
             return;
         }
 
-        // movement
+        // ==================================================
+        // PRIORITY INPUT: ESP32
+        // ==================================================
+        if (espInput != null && espInput.isConnected)
+        {
+            moveInput = new Vector2(espInput.horizontal, espInput.vertical);
+        }
+        // Kalau espInput null/tidak konek, moveInput diisi oleh Move() dari InputSystem
+
+        UpdateAnimator();
+    }
+
+    void FixedUpdate()
+    {
+        if (!canMove)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         rb.linearVelocity = moveInput * moveSpeed;
     }
 
-    public void Move(InputAction.CallbackContext context)
+    private void UpdateAnimator()
     {
-        // kalau freeze jangan baca input
-        if (!canMove)
-        {
-            rb.linearVelocity = Vector2.zero;
+        if (animator == null) return;
 
-            animator.SetBool("isWalking", false);
-
-            return;
-        }
-
-        moveInput = context.ReadValue<Vector2>();
-
-        // walking animation
-        animator.SetBool("isWalking", moveInput != Vector2.zero);
-
-        // direction animation
+        bool isWalking = moveInput != Vector2.zero;
+        animator.SetBool("isWalking", isWalking);
         animator.SetFloat("InputX", moveInput.x);
-
         animator.SetFloat("InputY", moveInput.y);
 
-        // last direction
-        if (context.canceled)
+        if (isWalking)
         {
             animator.SetFloat("LastInputX", moveInput.x);
-
             animator.SetFloat("LastInputY", moveInput.y);
         }
+    }
+
+    // INPUT SYSTEM (keyboard / gamepad) — dinonaktifkan kalau ESP32 konek
+    public void Move(InputAction.CallbackContext context)
+    {
+        if (espInput != null && espInput.isConnected) return;
+        if (!canMove) { moveInput = Vector2.zero; return; }
+
+        moveInput = Vector2.ClampMagnitude(context.ReadValue<Vector2>(), 1f);
+    }
+
+    // Override manual
+    public void SetExternalInput(Vector2 input)
+    {
+        moveInput = Vector2.ClampMagnitude(input, 1f);
     }
 }

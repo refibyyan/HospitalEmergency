@@ -4124,7 +4124,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1.8
+  m_PointLightOuterRadius: 2.4
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -5793,6 +5793,55 @@ RectTransform:
   m_AnchoredPosition: {x: -567, y: 390.9}
   m_SizeDelta: {x: 403.2, y: 209.5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1336845848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1336845850}
+  - component: {fileID: 1336845849}
+  m_Layer: 0
+  m_Name: ESP32Input
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1336845849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336845848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
+  portName: COM5
+  baudRate: 115200
+  horizontal: 0
+  vertical: 0
+  isConnected: 1
+--- !u!4 &1336845850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336845848}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.73242, y: 3.74181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1339936543
 GameObject:
   m_ObjectHideFlags: 0
@@ -6604,6 +6653,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: espInput
+      value: 
+      objectReference: {fileID: 1336845849}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8756,3 +8809,4 @@ SceneRoots:
   - {fileID: 1574379108}
   - {fileID: 1198475204}
   - {fileID: 2012722490}
+  - {fileID: 1336845850}

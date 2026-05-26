@@ -1,13 +1,25 @@
 fileFormatVersion: 2
-guid: c22f9cb91a8d4714da2173fcb7dc6d09
+guid: 822106258f3051b41b5ad04c0ca8de47
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1753101271485318929
-    second: Decision First Aid_0
+      213: 7452622166835271133
+    second: pot jatoh_0
   - first:
-      213: 9210098992882420407
-    second: Decision First Aid_1
+      213: 4918736961506996988
+    second: pot jatoh_1
+  - first:
+      213: -2125737837974982755
+    second: pot jatoh_2
+  - first:
+      213: -3983029823523981266
+    second: pot jatoh_3
+  - first:
+      213: 7815910939156037697
+    second: pot jatoh_4
+  - first:
+      213: 7013985533423720579
+    second: pot jatoh_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,7 +52,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -49,7 +61,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -78,7 +90,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,50 +112,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -155,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Decision First Aid_0
+      name: pot jatoh_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 398
-        width: 26
-        height: 47
+        x: 101
+        y: 121
+        width: 356
+        height: 191
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -170,20 +143,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fe8f4d19eabbba7e0800000000000000
-      internalID: -1753101271485318929
+      spriteID: dd51b6300680d6760800000000000000
+      internalID: 7452622166835271133
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Decision First Aid_1
+      name: pot jatoh_1
       rect:
         serializedVersion: 2
-        x: 49
-        y: 0
-        width: 492
-        height: 472
+        x: 448
+        y: 166
+        width: 36
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -192,8 +165,96 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7ba80f0ac38d0df70800000000000000
-      internalID: 9210098992882420407
+      spriteID: cf27536b43dd24440800000000000000
+      internalID: 4918736961506996988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pot jatoh_2
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 161
+        width: 29
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9fe4e1f2bcdf72e0800000000000000
+      internalID: -2125737837974982755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pot jatoh_3
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 119
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e28f01f7a7f69b8c0800000000000000
+      internalID: -3983029823523981266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pot jatoh_4
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 111
+        width: 36
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1404c74b691b77c60800000000000000
+      internalID: 7815910939156037697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pot jatoh_5
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 81
+        width: 29
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38813735eaea65160800000000000000
+      internalID: 7013985533423720579
       vertices: []
       indices: 
       edges: []
@@ -202,7 +263,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -212,8 +273,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Decision First Aid_0: -1753101271485318929
-      Decision First Aid_1: 9210098992882420407
+      pot jatoh_0: 7452622166835271133
+      pot jatoh_1: 4918736961506996988
+      pot jatoh_2: -2125737837974982755
+      pot jatoh_3: -3983029823523981266
+      pot jatoh_4: 7815910939156037697
+      pot jatoh_5: 7013985533423720579
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

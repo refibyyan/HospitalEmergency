@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1be024be291e61a41815fa5ded44d09a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
+  - fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
+  - player: {instanceID: 0}
+  - breakSound: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

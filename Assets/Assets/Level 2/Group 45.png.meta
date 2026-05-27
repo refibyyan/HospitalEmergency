@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6d6bee6dfa00d304b860066c29cd7553
+guid: 2f8b578d86324fc44a0e6b962748c008
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -805410026631354053
-    second: Inner Decision Timer_0
+      213: 610908720128868772
+    second: Group 45_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Inner Decision Timer_0
+      name: Group 45_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 14
-        height: 35
+        width: 492
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b39a91819db92d4f0800000000000000
-      internalID: -805410026631354053
+      spriteID: 4a148758e326a7800800000000000000
+      internalID: 610908720128868772
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Inner Decision Timer_0: -805410026631354053
+      Group 45_0: 610908720128868772
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

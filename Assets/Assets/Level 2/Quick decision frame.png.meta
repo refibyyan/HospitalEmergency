@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 6ac714f0cec9c3e47b9a6d6cfe17c7af
+guid: 406bf26d56b1c274c97352584232a99b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8120302050354792237
-    second: Group 35_0
+      213: 8135095739020636715
+    second: Quick decision frame_0
+  - first:
+      213: -6499031824900279442
+    second: Quick decision frame_1
+  - first:
+      213: -3577126862977787198
+    second: Quick decision frame_2
+  - first:
+      213: -5015812961240840268
+    second: Quick decision frame_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +122,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Group 35_0
+      name: Quick decision frame_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 403
-        height: 185
+        y: 848
+        width: 1536
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +137,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3d8f9b3fe44ee4f80800000000000000
-      internalID: -8120302050354792237
+      spriteID: b227e1a197aa5e070800000000000000
+      internalID: 8135095739020636715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quick decision frame_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1513
+        height: 870
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e633cd41dfccec5a0800000000000000
+      internalID: -6499031824900279442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quick decision frame_2
+      rect:
+        serializedVersion: 2
+        x: 994
+        y: 864
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ca93bf021e7b5ec0800000000000000
+      internalID: -3577126862977787198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quick decision frame_3
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 862
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b78079cfa0446ab0800000000000000
+      internalID: -5015812961240840268
       vertices: []
       indices: 
       edges: []
@@ -148,7 +223,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Group 35_0: -8120302050354792237
+      Quick decision frame_0: 8135095739020636715
+      Quick decision frame_1: -6499031824900279442
+      Quick decision frame_2: -3577126862977787198
+      Quick decision frame_3: -5015812961240840268
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

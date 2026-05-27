@@ -11,7 +11,10 @@ public class TriggerDecisionLv1 : MonoBehaviour
     public GameObject tampilKanan;
 
     [Header("Karakter Player")]
-    public MonoBehaviour scriptJalanLyra; // Tempat naruh script jalan si Lyra nanti
+    public MonoBehaviour scriptJalanLyra;
+
+    [Header("Popup Win")]
+    public MekanikDecision mekanikDecision;
 
     private bool diKotakKiri = true;
     private bool panelAktif = false;
@@ -22,6 +25,7 @@ public class TriggerDecisionLv1 : MonoBehaviour
         {
             decisionPanel.SetActive(false);
         }
+
         panelAktif = false;
     }
 
@@ -29,15 +33,19 @@ public class TriggerDecisionLv1 : MonoBehaviour
     {
         if (panelAktif)
         {
+            // pindah kanan
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 PindahKeKanan();
             }
+
+            // pindah kiri
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 PindahKeKiri();
             }
 
+            // pilih
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
             {
                 EksekusiPilihan();
@@ -49,21 +57,26 @@ public class TriggerDecisionLv1 : MonoBehaviour
     {
         if (other.CompareTag("Player") || other.name.Contains("lyra"))
         {
-            if (dialogueBox != null) dialogueBox.SetActive(false);
+            // hilangkan dialogue
+            if (dialogueBox != null)
+                dialogueBox.SetActive(false);
 
+            // tampilkan panel pilihan
             if (decisionPanel != null)
             {
                 decisionPanel.SetActive(true);
                 panelAktif = true;
+
+                // default pilihan kiri
                 PindahKeKiri();
 
-                // Matikan script pergerakan Lyra agar dia tidak bisa jalan-jalan
+                // matikan gerak player
                 if (scriptJalanLyra != null)
                 {
                     scriptJalanLyra.enabled = false;
 
-                    // Berhentikan sisa dorongan/kecepatan di badan Lyra jika dia pakai Rigidbody2D
                     Rigidbody2D rbLyra = other.GetComponent<Rigidbody2D>();
+
                     if (rbLyra != null)
                     {
                         rbLyra.linearVelocity = Vector2.zero;
@@ -76,25 +89,38 @@ public class TriggerDecisionLv1 : MonoBehaviour
     public void PindahKeKanan()
     {
         diKotakKiri = false;
-        if (tampilKiri != null) tampilKiri.SetActive(false);
-        if (tampilKanan != null) tampilKanan.SetActive(true);
+
+        if (tampilKiri != null)
+            tampilKiri.SetActive(false);
+
+        if (tampilKanan != null)
+            tampilKanan.SetActive(true);
     }
 
     public void PindahKeKiri()
     {
         diKotakKiri = true;
-        if (tampilKiri != null) tampilKiri.SetActive(true);
-        if (tampilKanan != null) tampilKanan.SetActive(false);
+
+        if (tampilKiri != null)
+            tampilKiri.SetActive(true);
+
+        if (tampilKanan != null)
+            tampilKanan.SetActive(false);
     }
 
     public void EksekusiPilihan()
     {
         panelAktif = false;
-        if (decisionPanel != null) decisionPanel.SetActive(false);
 
-        // Aktifkan kembali script pergerakan Lyra setelah selesai memilih
-        if (scriptJalanLyra != null) scriptJalanLyra.enabled = true;
+        // sembunyikan panel pilihan
+        if (decisionPanel != null)
+            decisionPanel.SetActive(false);
 
+        // aktifkan lagi gerakan player
+        if (scriptJalanLyra != null)
+            scriptJalanLyra.enabled = true;
+
+        // debug pilihan
         if (diKotakKiri)
         {
             Debug.Log("PILIHAN FINAL: GIVE FIRST AID!");
@@ -102,6 +128,12 @@ public class TriggerDecisionLv1 : MonoBehaviour
         else
         {
             Debug.Log("PILIHAN FINAL: RUSH TO THE ER!");
+        }
+
+        // munculkan popup menang
+        if (mekanikDecision != null)
+        {
+            mekanikDecision.Menang();
         }
     }
 }

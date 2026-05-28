@@ -9,6 +9,9 @@ public class SceneIntroManager : MonoBehaviour
     [System.Serializable]
     public class DialogueData
     {
+        [Header("Player Name")]
+        public string playerName;
+
         [TextArea]
         public string dialogueText;
 
@@ -32,11 +35,11 @@ public class SceneIntroManager : MonoBehaviour
 
     public TMP_Text dialogueTMP;
 
-    [Header("Dialogue 1-3 (Masih Hitam)")]
-    public DialogueData[] introDarkDialogues;
+    [Header("Player Name Text")]
+    public TMP_Text playerNameTMP;
 
-    [Header("Dialogue 4-6 (Setelah Fade Hilang)")]
-    public DialogueData[] introLightDialogues;
+    [Header("Single Intro Dialogue")]
+    public DialogueData[] introDialogues;
 
     [Header("Lights")]
     public Light2D globalLight;
@@ -45,15 +48,25 @@ public class SceneIntroManager : MonoBehaviour
 
     [Header("Player Movement Script")]
     public PlayerMovement playerMovementScript;
+
     [Header("Popup")]
     public GameObject popupSprite;
 
     private AudioSource dialogueAudioSource;
 
+    // =========================================
+    // AWAKE
+    // =========================================
+
     private void Awake()
     {
-        dialogueAudioSource = gameObject.AddComponent<AudioSource>();
+        dialogueAudioSource =
+            gameObject.AddComponent<AudioSource>();
     }
+
+    // =========================================
+    // START
+    // =========================================
 
     IEnumerator Start()
     {
@@ -75,55 +88,83 @@ public class SceneIntroManager : MonoBehaviour
             playerMovementScript.canMove = false;
         }
 
-        // awal terang
+        // global light
         if (globalLight != null)
         {
             globalLight.intensity = 1f;
         }
 
-        // character light mati
+        // character light off
         if (characterLight != null)
         {
             characterLight.enabled = false;
         }
 
-        // layar hitam total
+        // =====================================
+        // FORCE BLACK SCREEN
+        // =====================================
+
         if (fadeImage != null)
         {
+            fadeImage.gameObject.SetActive(true);
+
+            // biar fade image paling depan
+            fadeImage.transform.SetAsLastSibling();
+
             Color color = fadeImage.color;
-            color.a = 1;
+
+            color.r = 0f;
+            color.g = 0f;
+            color.b = 0f;
+            color.a = 1f;
+
             fadeImage.color = color;
         }
 
+        // tunggu 1 frame
+        yield return null;
+
         yield return new WaitForSeconds(0.5f);
 
-        // dialogue 1-3
-        yield return StartCoroutine(
-            PlayDialogueSequence(introDarkDialogues)
-        );
+        // =====================================
+        // FADE OUT
+        // =====================================
 
-        // fade hilang
         yield return StartCoroutine(FadeOut());
 
-        // dialogue 4-6
+        // =====================================
+        // PLAY DIALOGUE
+        // =====================================
+
         yield return StartCoroutine(
-            PlayDialogueSequence(introLightDialogues)
+            PlayDialogueSequence(introDialogues)
         );
 
-        // player bisa gerak
+        // =====================================
+        // PLAYER MOVE ON
+        // =====================================
+
         if (playerMovementScript != null)
         {
             playerMovementScript.canMove = true;
         }
 
-        // popup muncul
+        // =====================================
+        // POPUP SHOW
+        // =====================================
+
         if (popupSprite != null)
         {
             popupSprite.SetActive(true);
         }
     }
 
-    public IEnumerator PlayDialogueSequence(DialogueData[] dialogues)
+    // =========================================
+    // PLAY DIALOGUE SEQUENCE
+    // =========================================
+
+    public IEnumerator PlayDialogueSequence(
+        DialogueData[] dialogues)
     {
         if (dialogueBox != null)
         {
@@ -147,43 +188,59 @@ public class SceneIntroManager : MonoBehaviour
         }
     }
 
+    // =========================================
+    // TYPEWRITER
+    // =========================================
+
     public IEnumerator TypeWriter(DialogueData data)
     {
         if (dialogueTMP == null)
             yield break;
 
-        // reset text TOTAL
+        // reset text
         dialogueTMP.text = string.Empty;
 
-        // refresh TMP
+        // player name
+        if (playerNameTMP != null)
+        {
+            playerNameTMP.text = data.playerName;
+        }
+
         dialogueTMP.ForceMeshUpdate();
 
-        // bersihin enter/spasi aneh
+        // clean text
         string cleanText =
             data.dialogueText
             .Replace("\n", "")
             .Replace("\r", "")
             .Trim();
 
+        // =====================================
         // PLAY AUDIO
+        // =====================================
+
         if (data.dialogueSFX != null)
         {
             dialogueAudioSource.Stop();
 
-            dialogueAudioSource.clip = data.dialogueSFX;
+            dialogueAudioSource.clip =
+                data.dialogueSFX;
 
             dialogueAudioSource.loop = true;
 
             dialogueAudioSource.Play();
         }
 
-        // TYPEWRITER
+        // =====================================
+        // TYPEWRITER EFFECT
+        // =====================================
+
         foreach (char c in cleanText)
         {
             dialogueTMP.text += c;
 
-            // refresh canvas
             dialogueTMP.ForceMeshUpdate();
+
             Canvas.ForceUpdateCanvases();
 
             yield return new WaitForSeconds(
@@ -191,16 +248,23 @@ public class SceneIntroManager : MonoBehaviour
             );
         }
 
+        // =====================================
         // STOP AUDIO
+        // =====================================
+
         dialogueAudioSource.Stop();
     }
+
+    // =========================================
+    // FADE OUT
+    // =========================================
 
     IEnumerator FadeOut()
     {
         if (fadeImage == null)
             yield break;
 
-        float time = 0;
+        float time = 0f;
 
         Color color = fadeImage.color;
 
@@ -208,18 +272,21 @@ public class SceneIntroManager : MonoBehaviour
         {
             time += Time.deltaTime;
 
-            color.a = Mathf.Lerp(
-                1,
-                0,
-                time / fadeDuration
-            );
+            float alpha =
+                Mathf.Lerp(
+                    1f,
+                    0f,
+                    time / fadeDuration
+                );
+
+            color.a = alpha;
 
             fadeImage.color = color;
 
             yield return null;
         }
 
-        color.a = 0;
+        color.a = 0f;
 
         fadeImage.color = color;
     }

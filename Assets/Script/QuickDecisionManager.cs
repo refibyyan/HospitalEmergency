@@ -1,21 +1,25 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Collections;
+using UnityEngine.Rendering.Universal;
 
 public class QuickDecisionManager : MonoBehaviour
 {
     [Header("MAIN UI")]
-    public GameObject quickDecisionUI;
-    public CanvasGroup quickDecisionCanvas;
+    public GameObject quickDecisionTemplate;
 
-    [Header("FADE IMAGE")]
-    public Image fadeImage;
+    public GameObject popupChoice1;
+    public GameObject popupChoice2;
+    public GameObject popupChoice3;
 
-    [Range(0f, 1f)]
-    public float fadeDarkAlpha = 0.6f;
+    public GameObject popupDarkOverlay;
 
-    [Header("CHOICES")]
+    [Header("TOP LEFT POPUP OBJ")]
+    public GameObject popupObjRestart;
+    public GameObject popupObjGenerator;
+
+    [Header("CHOICE IMAGE")]
     public Image choice1;
     public Image choice2;
     public Image choice3;
@@ -30,30 +34,14 @@ public class QuickDecisionManager : MonoBehaviour
     public Sprite choice3OFF;
     public Sprite choice3ON;
 
-    [Header("TIMER")]
-    public Image timerFill;
-    public float timerDuration = 15f;
-
-    [Header("POPUPS")]
-    public GameObject popupChoice1;
-    public GameObject popupChoice2;
-    public GameObject popupChoice3;
-
-    [Header("PLAYER")]
-    public MonoBehaviour playerMovement;
-
-    [Header("AUDIO")]
-    public AudioSource audioSource;
-
-    public AudioClip selectSFX;
-    public AudioClip confirmSFX;
-    public AudioClip timerSFX;
-
-    [Header("CHOICE 1 BUTTONS")]
+    [Header("CHOICE 1 BUTTON")]
     public Image restartButton1;
     public Image exitButton1;
 
-    [Header("CHOICE 3 BUTTONS")]
+    [Header("CHOICE 2 BUTTON")]
+    public Image continueButton2;
+
+    [Header("CHOICE 3 BUTTON")]
     public Image restartButton3;
     public Image exitButton3;
 
@@ -64,46 +52,117 @@ public class QuickDecisionManager : MonoBehaviour
     public Sprite exitOFF;
     public Sprite exitON;
 
+    public Sprite continueOFF;
+    public Sprite continueON;
+
+    [Header("PLAYER")]
+    public PlayerMovement playerMovement;
+
+    [Header("GLOBAL LIGHT")]
+    public Light2D globalLight;
+
+    [Header("TIMER")]
+    public Image timerFill;
+
+    public float timerDuration = 15f;
+
+    [Header("AUDIO")]
+    public AudioSource audioSource;
+
+    public AudioClip selectSFX;
+    public AudioClip confirmSFX;
+    public AudioClip timerSFX;
+
+    // =========================================
+    // STATE
+    // =========================================
+
+    bool waitingRestartTrigger = false;
+
+    bool waitingGeneratorTrigger = false;
+
     bool uiActive = false;
+
     bool popupOpened = false;
+
+    bool eventStarted = false;
+
+    bool triggerUsed = false;
 
     int currentChoice = 0;
 
     int currentPopupButton = 0;
+
     int currentPopupType = 0;
+    // 1 = popup1
+    // 2 = popup2
+    // 3 = popup3
 
     float currentTimer;
 
+    // =========================================
+    // START
+    // =========================================
+
     void Start()
     {
-        quickDecisionUI.SetActive(false);
-
-        popupChoice1.SetActive(false);
-        popupChoice2.SetActive(false);
-        popupChoice3.SetActive(false);
-
-        quickDecisionCanvas.alpha = 0;
-
-        // FADE IMAGE
-        if (fadeImage != null)
+        if (quickDecisionTemplate != null)
         {
-            Color c = fadeImage.color;
-            c.a = 0;
-            fadeImage.color = c;
+            quickDecisionTemplate.SetActive(false);
+        }
 
-            fadeImage.gameObject.SetActive(false);
+        if (popupChoice1 != null)
+        {
+            popupChoice1.SetActive(false);
+        }
+
+        if (popupChoice2 != null)
+        {
+            popupChoice2.SetActive(false);
+        }
+
+        if (popupChoice3 != null)
+        {
+            popupChoice3.SetActive(false);
+        }
+
+        if (popupDarkOverlay != null)
+        {
+            popupDarkOverlay.SetActive(false);
+        }
+
+        if (popupObjRestart != null)
+        {
+            popupObjRestart.SetActive(false);
+        }
+
+        if (popupObjGenerator != null)
+        {
+            popupObjGenerator.SetActive(false);
         }
 
         UpdateChoiceVisual();
+
+        UpdatePopupVisual();
     }
+
+    // =========================================
+    // UPDATE
+    // =========================================
 
     void Update()
     {
-        if (!uiActive) return;
+        if (uiActive && !popupOpened)
+        {
+            HandleMainInput();
 
-        HandleInput();
+            HandleTimer();
+        }
 
-        HandleTimer();
+        if (popupOpened)
+        {
+            HandlePopupInput();
+        }
     }
 
     // =========================================
@@ -112,41 +171,54 @@ public class QuickDecisionManager : MonoBehaviour
 
     public void StartDecision()
     {
-        if (uiActive) return;
+        // trigger hanya sekali
+        if (triggerUsed)
+            return;
 
-        StartCoroutine(StartDecisionRoutine());
-    }
+        if (uiActive)
+            return;
 
-    IEnumerator StartDecisionRoutine()
-    {
+        triggerUsed = true;
+
         uiActive = true;
-
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = false;
-        }
-
-        quickDecisionUI.SetActive(true);
-
-        // FADE BACKGROUND ON
-        if (fadeImage != null)
-        {
-            fadeImage.gameObject.SetActive(true);
-
-            StartCoroutine(FadeBackground(0, fadeDarkAlpha, 1f));
-        }
 
         currentChoice = 0;
 
-        currentTimer = 0;
+        currentTimer = 0f;
 
-        timerFill.fillAmount = 0;
+        if (timerFill != null)
+        {
+            timerFill.fillAmount = 0f;
+        }
+
+        if (quickDecisionTemplate != null)
+        {
+            quickDecisionTemplate.SetActive(true);
+        }
+
+        // overlay MATI saat quick decision
+        if (popupDarkOverlay != null)
+        {
+            popupDarkOverlay.SetActive(false);
+        }
+
+        if (playerMovement != null)
+        {
+            playerMovement.canMove = false;
+        }
 
         UpdateChoiceVisual();
 
-        PlaySFX(timerSFX);
+        // TIMER SFX
+        if (audioSource != null &&
+            timerSFX != null)
+        {
+            audioSource.clip = timerSFX;
 
-        yield return StartCoroutine(FadeCanvas(0, 1, 1f));
+            audioSource.loop = true;
+
+            audioSource.Play();
+        }
     }
 
     // =========================================
@@ -155,110 +227,28 @@ public class QuickDecisionManager : MonoBehaviour
 
     void HandleTimer()
     {
-        if (popupOpened) return;
-
         currentTimer += Time.deltaTime;
 
-        timerFill.fillAmount = currentTimer / timerDuration;
+        if (timerFill != null)
+        {
+            timerFill.fillAmount =
+                currentTimer / timerDuration;
+        }
 
         if (currentTimer >= timerDuration)
         {
-            SceneManager.LoadScene("Level2");
+            SceneManager.LoadScene(
+                SceneManager.GetActiveScene().name
+            );
         }
     }
 
     // =========================================
-    // INPUT
+    // MAIN INPUT
     // =========================================
 
-    void HandleInput()
+    void HandleMainInput()
     {
-        // =====================================
-        // POPUP INPUT
-        // =====================================
-
-        if (popupOpened)
-        {
-            // CHOICE 2
-            if (currentPopupType == 2)
-            {
-                if (Input.GetKeyDown(KeyCode.Return))
-                {
-                    PlaySFX(confirmSFX);
-
-                    Debug.Log("PINDAH SCENE NANTI");
-                }
-
-                return;
-            }
-
-            // RIGHT
-            if (Input.GetKeyDown(KeyCode.D) ||
-                Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                currentPopupButton++;
-
-                if (currentPopupButton > 1)
-                    currentPopupButton = 0;
-
-                UpdatePopupVisual();
-
-                PlaySFX(selectSFX);
-            }
-
-            // LEFT
-            if (Input.GetKeyDown(KeyCode.A) ||
-                Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                currentPopupButton--;
-
-                if (currentPopupButton < 0)
-                    currentPopupButton = 1;
-
-                UpdatePopupVisual();
-
-                PlaySFX(selectSFX);
-            }
-
-            // ENTER
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                PlaySFX(confirmSFX);
-
-                // POPUP 1
-                if (currentPopupType == 1)
-                {
-                    if (currentPopupButton == 0)
-                    {
-                        RestartLevel();
-                    }
-                    else
-                    {
-                        ExitGame();
-                    }
-                }
-
-                // POPUP 3
-                if (currentPopupType == 3)
-                {
-                    if (currentPopupButton == 0)
-                    {
-                        RestartLevel();
-                    }
-                    else
-                    {
-                        ExitGame();
-                    }
-                }
-            }
-
-            return;
-        }
-
-        // =====================================
-        // MAIN CHOICE INPUT
-        // =====================================
-
         // RIGHT
         if (Input.GetKeyDown(KeyCode.D) ||
             Input.GetKeyDown(KeyCode.RightArrow))
@@ -266,7 +256,9 @@ public class QuickDecisionManager : MonoBehaviour
             currentChoice++;
 
             if (currentChoice > 2)
+            {
                 currentChoice = 0;
+            }
 
             UpdateChoiceVisual();
 
@@ -280,7 +272,9 @@ public class QuickDecisionManager : MonoBehaviour
             currentChoice--;
 
             if (currentChoice < 0)
+            {
                 currentChoice = 2;
+            }
 
             UpdateChoiceVisual();
 
@@ -292,36 +286,169 @@ public class QuickDecisionManager : MonoBehaviour
         {
             PlaySFX(confirmSFX);
 
-            popupOpened = true;
-
-            currentPopupButton = 0;
-
+            // =====================================
             // CHOICE 1
+            // =====================================
+
             if (currentChoice == 0)
             {
-                popupChoice1.SetActive(true);
+                waitingRestartTrigger = true;
 
-                currentPopupType = 1;
+                HideAllDecisionUI();
 
-                UpdatePopupVisual();
+                if (popupObjRestart != null)
+                {
+                    popupObjRestart.SetActive(true);
+                }
+
+                // global light GELAP
+                if (globalLight != null)
+                {
+                    globalLight.intensity = 0.01f;
+                }
+
+                if (playerMovement != null)
+                {
+                    playerMovement.canMove = true;
+                }
             }
 
+            // =====================================
             // CHOICE 2
+            // =====================================
+
             if (currentChoice == 1)
             {
-                popupChoice2.SetActive(true);
+                waitingGeneratorTrigger = true;
 
-                currentPopupType = 2;
+                HideAllDecisionUI();
+
+                if (popupObjGenerator != null)
+                {
+                    popupObjGenerator.SetActive(true);
+                }
+
+                // SAMA kayak choice1
+                if (globalLight != null)
+                {
+                    globalLight.intensity = 0.01f;
+                }
+
+                if (playerMovement != null)
+                {
+                    playerMovement.canMove = true;
+                }
             }
 
+            // =====================================
             // CHOICE 3
+            // =====================================
+
             if (currentChoice == 2)
             {
-                popupChoice3.SetActive(true);
+                popupOpened = true;
 
                 currentPopupType = 3;
 
+                currentPopupButton = 0;
+
+                if (popupDarkOverlay != null)
+                {
+                    popupDarkOverlay.SetActive(true);
+                }
+
+                if (popupChoice3 != null)
+                {
+                    popupChoice3.SetActive(true);
+                }
+
                 UpdatePopupVisual();
+            }
+        }
+    }
+
+    // =========================================
+    // POPUP INPUT
+    // =========================================
+
+    void HandlePopupInput()
+    {
+        // =====================================
+        // POPUP CHOICE 2
+        // =====================================
+
+        if (currentPopupType == 2)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                PlaySFX(confirmSFX);
+
+                popupChoice2.SetActive(false);
+
+                popupDarkOverlay.SetActive(false);
+
+                popupOpened = false;
+
+                if (playerMovement != null)
+                {
+                    playerMovement.canMove = true;
+                }
+            }
+
+            return;
+        }
+
+        // =====================================
+        // POPUP 1 & 3
+        // =====================================
+
+        if (Input.GetKeyDown(KeyCode.D) ||
+            Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            currentPopupButton++;
+
+            if (currentPopupButton > 1)
+            {
+                currentPopupButton = 0;
+            }
+
+            UpdatePopupVisual();
+
+            PlaySFX(selectSFX);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A) ||
+            Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            currentPopupButton--;
+
+            if (currentPopupButton < 0)
+            {
+                currentPopupButton = 1;
+            }
+
+            UpdatePopupVisual();
+
+            PlaySFX(selectSFX);
+        }
+
+        // ENTER
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            PlaySFX(confirmSFX);
+
+            // RESTART
+            if (currentPopupButton == 0)
+            {
+                SceneManager.LoadScene(
+                    SceneManager.GetActiveScene().name
+                );
+            }
+
+            // EXIT
+            else
+            {
+                Application.Quit();
             }
         }
     }
@@ -332,9 +459,20 @@ public class QuickDecisionManager : MonoBehaviour
 
     void UpdateChoiceVisual()
     {
-        choice1.sprite = choice1OFF;
-        choice2.sprite = choice2OFF;
-        choice3.sprite = choice3OFF;
+        if (choice1 != null)
+        {
+            choice1.sprite = choice1OFF;
+        }
+
+        if (choice2 != null)
+        {
+            choice2.sprite = choice2OFF;
+        }
+
+        if (choice3 != null)
+        {
+            choice3.sprite = choice3OFF;
+        }
 
         if (currentChoice == 0)
         {
@@ -353,18 +491,43 @@ public class QuickDecisionManager : MonoBehaviour
     }
 
     // =========================================
-    // POPUP BUTTON VISUAL
+    // POPUP VISUAL
     // =========================================
 
     void UpdatePopupVisual()
     {
-        restartButton1.sprite = restartOFF;
-        exitButton1.sprite = exitOFF;
+        // RESET POPUP 1
+        if (restartButton1 != null)
+        {
+            restartButton1.sprite = restartOFF;
+        }
 
-        restartButton3.sprite = restartOFF;
-        exitButton3.sprite = exitOFF;
+        if (exitButton1 != null)
+        {
+            exitButton1.sprite = exitOFF;
+        }
 
+        // RESET POPUP 2
+        if (continueButton2 != null)
+        {
+            continueButton2.sprite = continueOFF;
+        }
+
+        // RESET POPUP 3
+        if (restartButton3 != null)
+        {
+            restartButton3.sprite = restartOFF;
+        }
+
+        if (exitButton3 != null)
+        {
+            exitButton3.sprite = exitOFF;
+        }
+
+        // =====================================
         // POPUP 1
+        // =====================================
+
         if (currentPopupType == 1)
         {
             if (currentPopupButton == 0)
@@ -377,7 +540,19 @@ public class QuickDecisionManager : MonoBehaviour
             }
         }
 
+        // =====================================
+        // POPUP 2
+        // =====================================
+
+        if (currentPopupType == 2)
+        {
+            continueButton2.sprite = continueON;
+        }
+
+        // =====================================
         // POPUP 3
+        // =====================================
+
         if (currentPopupType == 3)
         {
             if (currentPopupButton == 0)
@@ -392,50 +567,158 @@ public class QuickDecisionManager : MonoBehaviour
     }
 
     // =========================================
-    // FADE CANVAS
+    // HIDE UI
     // =========================================
 
-    IEnumerator FadeCanvas(float start, float end, float duration)
+    void HideAllDecisionUI()
     {
-        float t = 0;
-
-        while (t < duration)
+        if (quickDecisionTemplate != null)
         {
-            t += Time.deltaTime;
-
-            quickDecisionCanvas.alpha =
-                Mathf.Lerp(start, end, t / duration);
-
-            yield return null;
+            quickDecisionTemplate.SetActive(false);
         }
 
-        quickDecisionCanvas.alpha = end;
+        if (popupChoice1 != null)
+        {
+            popupChoice1.SetActive(false);
+        }
+
+        if (popupChoice2 != null)
+        {
+            popupChoice2.SetActive(false);
+        }
+
+        if (popupChoice3 != null)
+        {
+            popupChoice3.SetActive(false);
+        }
+
+        if (popupDarkOverlay != null)
+        {
+            popupDarkOverlay.SetActive(false);
+        }
+
+        // STOP TIMER AUDIO
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
+        uiActive = false;
+
+        popupOpened = false;
     }
 
     // =========================================
-    // FADE BACKGROUND
+    // PUBLIC TRIGGER CALL
     // =========================================
 
-    IEnumerator FadeBackground(float start, float end, float duration)
+    public void TriggerRestartEvent()
     {
-        float t = 0;
+        if (eventStarted)
+            return;
 
-        Color c = fadeImage.color;
+        if (!waitingRestartTrigger)
+            return;
 
-        while (t < duration)
+        StartCoroutine(RestartLightEvent());
+    }
+
+    public void TriggerGeneratorEvent()
+    {
+        if (eventStarted)
+            return;
+
+        if (!waitingGeneratorTrigger)
+            return;
+
+        StartCoroutine(GeneratorEvent());
+    }
+
+    // =========================================
+    // RESTART EVENT
+    // =========================================
+
+    IEnumerator RestartLightEvent()
+    {
+        eventStarted = true;
+
+        waitingRestartTrigger = false;
+
+        if (playerMovement != null)
         {
-            t += Time.deltaTime;
-
-            c.a = Mathf.Lerp(start, end, t / duration);
-
-            fadeImage.color = c;
-
-            yield return null;
+            playerMovement.canMove = false;
         }
 
-        c.a = end;
+        if (popupObjRestart != null)
+        {
+            popupObjRestart.SetActive(false);
+        }
 
-        fadeImage.color = c;
+        float timer = 0f;
+
+        while (timer < 2.5f)
+        {
+            timer += 0.2f;
+
+            globalLight.intensity = 1f;
+
+            yield return new WaitForSeconds(0.1f);
+
+            globalLight.intensity = 0.2f;
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        popupOpened = true;
+
+        currentPopupType = 1;
+
+        currentPopupButton = 0;
+
+        popupDarkOverlay.SetActive(true);
+
+        popupChoice1.SetActive(true);
+
+        UpdatePopupVisual();
+    }
+
+    // =========================================
+    // GENERATOR EVENT
+    // =========================================
+
+    IEnumerator GeneratorEvent()
+    {
+        eventStarted = true;
+
+        waitingGeneratorTrigger = false;
+
+        if (playerMovement != null)
+        {
+            playerMovement.canMove = false;
+        }
+
+        if (popupObjGenerator != null)
+        {
+            popupObjGenerator.SetActive(false);
+        }
+
+        // baru nyala pas nyentuh generator
+        if (globalLight != null)
+        {
+            globalLight.intensity = 1f;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        popupOpened = true;
+
+        currentPopupType = 2;
+
+        popupDarkOverlay.SetActive(true);
+
+        popupChoice2.SetActive(true);
+
+        UpdatePopupVisual();
     }
 
     // =========================================
@@ -444,23 +727,10 @@ public class QuickDecisionManager : MonoBehaviour
 
     void PlaySFX(AudioClip clip)
     {
-        if (clip != null && audioSource != null)
+        if (clip != null &&
+            audioSource != null)
         {
             audioSource.PlayOneShot(clip);
         }
-    }
-
-    // =========================================
-    // BUTTONS
-    // =========================================
-
-    public void RestartLevel()
-    {
-        SceneManager.LoadScene("Level2");
-    }
-
-    public void ExitGame()
-    {
-        Application.Quit();
     }
 }

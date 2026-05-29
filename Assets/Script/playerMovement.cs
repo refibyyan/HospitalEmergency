@@ -17,15 +17,26 @@ public class PlayerMovement : MonoBehaviour
     public AudioSource footstepSource;
     public AudioClip derapLangkah;
 
+    [Range(0f, 1f)]
+    public float footstepVolume = 1f;
+
     public bool canMove = true;
 
     void Start()
     {
-        rb       = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
         if (espInput == null)
             Debug.LogWarning("[PlayerMovement] espInput BELUM di-assign di Inspector!");
+
+        // FOOTSTEP SETUP
+        if (footstepSource != null)
+        {
+            footstepSource.playOnAwake = false;
+            footstepSource.loop = true;
+            footstepSource.volume = footstepVolume;
+        }
     }
 
     void Update()
@@ -33,21 +44,32 @@ public class PlayerMovement : MonoBehaviour
         if (!canMove)
         {
             moveInput = Vector2.zero;
+
             UpdateAnimator();
+
             HandleFootstepSound();
+
             return;
         }
 
         // ==================================================
         // PRIORITY INPUT: ESP32
         // ==================================================
+
         if (espInput != null && espInput.isConnected)
         {
-            moveInput = new Vector2(espInput.horizontal, espInput.vertical);
+            moveInput = new Vector2(
+                espInput.horizontal,
+                espInput.vertical
+            );
         }
-        // Kalau espInput null/tidak konek, moveInput diisi oleh Move() dari InputSystem
+
+        // Kalau espInput null/tidak konek,
+        // moveInput diisi oleh Move() dari InputSystem
 
         UpdateAnimator();
+
+        HandleFootstepSound();
     }
 
     void FixedUpdate()
@@ -66,7 +88,9 @@ public class PlayerMovement : MonoBehaviour
         if (animator == null) return;
 
         bool isWalking = moveInput != Vector2.zero;
+
         animator.SetBool("isWalking", isWalking);
+
         animator.SetFloat("InputX", moveInput.x);
         animator.SetFloat("InputY", moveInput.y);
 
@@ -77,35 +101,37 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // INPUT SYSTEM (keyboard / gamepad) — dinonaktifkan kalau ESP32 konek
-    public void Move(InputAction.CallbackContext context)
-    {
-        if (espInput != null && espInput.isConnected) return;
-        if (!canMove) { moveInput = Vector2.zero; return; }
+    // =========================================
+    // FOOTSTEP SOUND
+    // =========================================
 
-        moveInput = Vector2.ClampMagnitude(context.ReadValue<Vector2>(), 1f);
-    }
-
-    // Override manual
-    public void SetExternalInput(Vector2 input)
-    {
-        moveInput = Vector2.ClampMagnitude(input, 1f);
-    }
     private void HandleFootstepSound()
     {
-        bool isWalking = moveInput != Vector2.zero;
+        bool isWalking =
+            animator != null &&
+            animator.GetBool("isWalking");
 
+        // PLAY FOOTSTEP
         if (isWalking)
         {
             if (footstepSource != null &&
-                derapLangkah != null &&
-                !footstepSource.isPlaying)
+                derapLangkah != null)
             {
-                footstepSource.clip = derapLangkah;
-                footstepSource.loop = true;
-                footstepSource.Play();
+                footstepSource.volume =
+                    footstepVolume;
+
+                if (!footstepSource.isPlaying)
+                {
+                    footstepSource.clip =
+                        derapLangkah;
+
+                    footstepSource.loop = true;
+
+                    footstepSource.Play();
+                }
             }
         }
+        // STOP FOOTSTEP
         else
         {
             if (footstepSource != null &&
@@ -114,5 +140,37 @@ public class PlayerMovement : MonoBehaviour
                 footstepSource.Stop();
             }
         }
+    }
+
+    // INPUT SYSTEM (keyboard / gamepad)
+    // dinonaktifkan kalau ESP32 konek
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        if (espInput != null &&
+            espInput.isConnected)
+            return;
+
+        if (!canMove)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
+        moveInput =
+            Vector2.ClampMagnitude(
+                context.ReadValue<Vector2>(),
+                1f
+            );
+    }
+
+    // Override manual
+    public void SetExternalInput(Vector2 input)
+    {
+        moveInput =
+            Vector2.ClampMagnitude(
+                input,
+                1f
+            );
     }
 }

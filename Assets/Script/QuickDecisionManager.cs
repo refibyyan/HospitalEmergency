@@ -20,6 +20,9 @@ public class QuickDecisionManager : MonoBehaviour
     public GameObject popupObjRestart;
     public GameObject popupObjGenerator;
 
+    [Header("TRIGGER DECISION")]
+    public GameObject triggerDecision;
+
     [Header("CHOICE IMAGE")]
     public Image choice1;
     public Image choice2;
@@ -86,83 +89,50 @@ public class QuickDecisionManager : MonoBehaviour
 
     public AudioClip missionTimerSFX;
 
-    // =========================================
-    // STATE
-    // =========================================
-
     bool waitingRestartTrigger = false;
-
     bool waitingGeneratorTrigger = false;
-
     bool uiActive = false;
-
     bool popupOpened = false;
-
     bool eventStarted = false;
-
     bool triggerUsed = false;
-
     bool missionTimerRunning = false;
 
     int currentChoice = 0;
-
     int currentPopupButton = 0;
-
     int currentPopupType = 0;
-    // 1 = popup1
-    // 2 = popup2
-    // 3 = popup3
 
     float currentTimer;
-
     float currentMissionTimer;
-
-    // =========================================
-    // START
-    // =========================================
 
     void Start()
     {
         if (quickDecisionTemplate != null)
-        {
             quickDecisionTemplate.SetActive(false);
-        }
 
         if (popupChoice1 != null)
-        {
             popupChoice1.SetActive(false);
-        }
 
         if (popupChoice2 != null)
-        {
             popupChoice2.SetActive(false);
-        }
 
         if (popupChoice3 != null)
-        {
             popupChoice3.SetActive(false);
-        }
 
         if (popupDarkOverlay != null)
-        {
             popupDarkOverlay.SetActive(false);
-        }
 
         if (popupObjRestart != null)
-        {
             popupObjRestart.SetActive(false);
-        }
 
         if (popupObjGenerator != null)
-        {
             popupObjGenerator.SetActive(false);
-        }
 
-        // TIMER TEMPLATE OFF
         if (timerTemplate != null)
-        {
             timerTemplate.SetActive(false);
-        }
+
+        // TRIGGER DECISION OFF DI AWAL
+        if (triggerDecision != null)
+            triggerDecision.SetActive(false);
 
         UpdateChoiceVisual();
 
@@ -170,15 +140,22 @@ public class QuickDecisionManager : MonoBehaviour
     }
 
     // =========================================
-    // UPDATE
+    // AKTIFKAN TRIGGER DECISION
     // =========================================
+
+    public void ActivateDecisionTrigger()
+    {
+        if (triggerDecision != null)
+        {
+            triggerDecision.SetActive(true);
+        }
+    }
 
     void Update()
     {
         if (uiActive && !popupOpened)
         {
             HandleMainInput();
-
             HandleTimer();
         }
 
@@ -187,20 +164,14 @@ public class QuickDecisionManager : MonoBehaviour
             HandlePopupInput();
         }
 
-        // MISSION TIMER
         if (missionTimerRunning)
         {
             HandleMissionTimer();
         }
     }
 
-    // =========================================
-    // START DECISION
-    // =========================================
-
     public void StartDecision()
     {
-        // trigger hanya sekali
         if (triggerUsed)
             return;
 
@@ -208,6 +179,12 @@ public class QuickDecisionManager : MonoBehaviour
             return;
 
         triggerUsed = true;
+
+        // HILANGKAN TRIGGER SETELAH DIPAKAI
+        if (triggerDecision != null)
+        {
+            triggerDecision.SetActive(false);
+        }
 
         uiActive = true;
 
@@ -225,7 +202,6 @@ public class QuickDecisionManager : MonoBehaviour
             quickDecisionTemplate.SetActive(true);
         }
 
-        // overlay MATI saat quick decision
         if (popupDarkOverlay != null)
         {
             popupDarkOverlay.SetActive(false);
@@ -238,7 +214,6 @@ public class QuickDecisionManager : MonoBehaviour
 
         UpdateChoiceVisual();
 
-        // TIMER SFX
         if (audioSource != null &&
             timerSFX != null)
         {
@@ -249,10 +224,6 @@ public class QuickDecisionManager : MonoBehaviour
             audioSource.Play();
         }
     }
-
-    // =========================================
-    // TIMER
-    // =========================================
 
     void HandleTimer()
     {
@@ -272,10 +243,6 @@ public class QuickDecisionManager : MonoBehaviour
         }
     }
 
-    // =========================================
-    // MISSION TIMER
-    // =========================================
-
     void StartMissionTimer()
     {
         missionTimerRunning = true;
@@ -289,7 +256,6 @@ public class QuickDecisionManager : MonoBehaviour
 
         UpdateMissionTimerUI();
 
-        // TIMER SFX LOOP
         if (missionTimerAudioSource != null &&
             missionTimerSFX != null)
         {
@@ -348,13 +314,8 @@ public class QuickDecisionManager : MonoBehaviour
         }
     }
 
-    // =========================================
-    // MAIN INPUT
-    // =========================================
-
     void HandleMainInput()
     {
-        // RIGHT
         if (Input.GetKeyDown(KeyCode.D) ||
             Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -370,7 +331,6 @@ public class QuickDecisionManager : MonoBehaviour
             PlaySFX(selectSFX);
         }
 
-        // LEFT
         if (Input.GetKeyDown(KeyCode.A) ||
             Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -386,14 +346,9 @@ public class QuickDecisionManager : MonoBehaviour
             PlaySFX(selectSFX);
         }
 
-        // ENTER
         if (Input.GetKeyDown(KeyCode.Return))
         {
             PlaySFX(confirmSFX);
-
-            // =====================================
-            // CHOICE 1
-            // =====================================
 
             if (currentChoice == 0)
             {
@@ -406,7 +361,6 @@ public class QuickDecisionManager : MonoBehaviour
                     popupObjRestart.SetActive(true);
                 }
 
-                // global light GELAP
                 if (globalLight != null)
                 {
                     globalLight.intensity = 0.01f;
@@ -417,13 +371,8 @@ public class QuickDecisionManager : MonoBehaviour
                     playerMovement.canMove = true;
                 }
 
-                // START TIMER
                 StartMissionTimer();
             }
-
-            // =====================================
-            // CHOICE 2
-            // =====================================
 
             if (currentChoice == 1)
             {
@@ -436,7 +385,6 @@ public class QuickDecisionManager : MonoBehaviour
                     popupObjGenerator.SetActive(true);
                 }
 
-                // SAMA kayak choice1
                 if (globalLight != null)
                 {
                     globalLight.intensity = 0.01f;
@@ -447,13 +395,8 @@ public class QuickDecisionManager : MonoBehaviour
                     playerMovement.canMove = true;
                 }
 
-                // START TIMER
                 StartMissionTimer();
             }
-
-            // =====================================
-            // CHOICE 3
-            // =====================================
 
             if (currentChoice == 2)
             {
@@ -478,16 +421,8 @@ public class QuickDecisionManager : MonoBehaviour
         }
     }
 
-    // =========================================
-    // POPUP INPUT
-    // =========================================
-
     void HandlePopupInput()
     {
-        // =====================================
-        // POPUP CHOICE 2
-        // =====================================
-
         if (currentPopupType == 2)
         {
             if (Input.GetKeyDown(KeyCode.Return))
@@ -508,10 +443,6 @@ public class QuickDecisionManager : MonoBehaviour
 
             return;
         }
-
-        // =====================================
-        // POPUP 1 & 3
-        // =====================================
 
         if (Input.GetKeyDown(KeyCode.D) ||
             Input.GetKeyDown(KeyCode.RightArrow))
@@ -543,20 +474,16 @@ public class QuickDecisionManager : MonoBehaviour
             PlaySFX(selectSFX);
         }
 
-        // ENTER
         if (Input.GetKeyDown(KeyCode.Return))
         {
             PlaySFX(confirmSFX);
 
-            // RESTART
             if (currentPopupButton == 0)
             {
                 SceneManager.LoadScene(
                     SceneManager.GetActiveScene().name
                 );
             }
-
-            // EXIT
             else
             {
                 Application.Quit();
@@ -564,80 +491,43 @@ public class QuickDecisionManager : MonoBehaviour
         }
     }
 
-    // =========================================
-    // CHOICE VISUAL
-    // =========================================
-
     void UpdateChoiceVisual()
     {
         if (choice1 != null)
-        {
             choice1.sprite = choice1OFF;
-        }
 
         if (choice2 != null)
-        {
             choice2.sprite = choice2OFF;
-        }
 
         if (choice3 != null)
-        {
             choice3.sprite = choice3OFF;
-        }
 
         if (currentChoice == 0)
-        {
             choice1.sprite = choice1ON;
-        }
 
         if (currentChoice == 1)
-        {
             choice2.sprite = choice2ON;
-        }
 
         if (currentChoice == 2)
-        {
             choice3.sprite = choice3ON;
-        }
     }
-
-    // =========================================
-    // POPUP VISUAL
-    // =========================================
 
     void UpdatePopupVisual()
     {
-        // RESET POPUP 1
         if (restartButton1 != null)
-        {
             restartButton1.sprite = restartOFF;
-        }
 
         if (exitButton1 != null)
-        {
             exitButton1.sprite = exitOFF;
-        }
 
-        // RESET POPUP 2
         if (continueButton2 != null)
-        {
             continueButton2.sprite = continueOFF;
-        }
 
-        // RESET POPUP 3
         if (restartButton3 != null)
-        {
             restartButton3.sprite = restartOFF;
-        }
 
         if (exitButton3 != null)
-        {
             exitButton3.sprite = exitOFF;
-        }
-
-        // =====================================
-        // POPUP 1
-        // =====================================
 
         if (currentPopupType == 1)
         {
@@ -651,18 +541,10 @@ public class QuickDecisionManager : MonoBehaviour
             }
         }
 
-        // =====================================
-        // POPUP 2
-        // =====================================
-
         if (currentPopupType == 2)
         {
             continueButton2.sprite = continueON;
         }
-
-        // =====================================
-        // POPUP 3
-        // =====================================
 
         if (currentPopupType == 3)
         {
@@ -677,38 +559,23 @@ public class QuickDecisionManager : MonoBehaviour
         }
     }
 
-    // =========================================
-    // HIDE UI
-    // =========================================
-
     void HideAllDecisionUI()
     {
         if (quickDecisionTemplate != null)
-        {
             quickDecisionTemplate.SetActive(false);
-        }
 
         if (popupChoice1 != null)
-        {
             popupChoice1.SetActive(false);
-        }
 
         if (popupChoice2 != null)
-        {
             popupChoice2.SetActive(false);
-        }
 
         if (popupChoice3 != null)
-        {
             popupChoice3.SetActive(false);
-        }
 
         if (popupDarkOverlay != null)
-        {
             popupDarkOverlay.SetActive(false);
-        }
 
-        // STOP TIMER AUDIO
         if (audioSource != null)
         {
             audioSource.Stop();
@@ -719,10 +586,6 @@ public class QuickDecisionManager : MonoBehaviour
         popupOpened = false;
     }
 
-    // =========================================
-    // PUBLIC TRIGGER CALL
-    // =========================================
-
     public void TriggerRestartEvent()
     {
         if (eventStarted)
@@ -731,7 +594,6 @@ public class QuickDecisionManager : MonoBehaviour
         if (!waitingRestartTrigger)
             return;
 
-        // STOP TIMER
         StopMissionTimer();
 
         StartCoroutine(RestartLightEvent());
@@ -745,15 +607,10 @@ public class QuickDecisionManager : MonoBehaviour
         if (!waitingGeneratorTrigger)
             return;
 
-        // STOP TIMER
         StopMissionTimer();
 
         StartCoroutine(GeneratorEvent());
     }
-
-    // =========================================
-    // RESTART EVENT
-    // =========================================
 
     IEnumerator RestartLightEvent()
     {
@@ -799,10 +656,6 @@ public class QuickDecisionManager : MonoBehaviour
         UpdatePopupVisual();
     }
 
-    // =========================================
-    // GENERATOR EVENT
-    // =========================================
-
     IEnumerator GeneratorEvent()
     {
         eventStarted = true;
@@ -819,7 +672,6 @@ public class QuickDecisionManager : MonoBehaviour
             popupObjGenerator.SetActive(false);
         }
 
-        // baru nyala pas nyentuh generator
         if (globalLight != null)
         {
             globalLight.intensity = 1f;
@@ -837,10 +689,6 @@ public class QuickDecisionManager : MonoBehaviour
 
         UpdatePopupVisual();
     }
-
-    // =========================================
-    // AUDIO
-    // =========================================
 
     void PlaySFX(AudioClip clip)
     {

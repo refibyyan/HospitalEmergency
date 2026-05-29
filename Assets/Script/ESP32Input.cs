@@ -9,12 +9,31 @@ public class ESP32Input : MonoBehaviour
     [SerializeField] private string portName = "COM5";
     [SerializeField] private int baudRate = 115200;
 
+    [Header("Joystick Settings")]
+    [Range(0.1f, 1f)]
+    public float joystickSensitivity = 0.5f;
+
+    [Range(0.1f, 5f)]
+    public float joystickMoveMultiplier = 1f;
+
     [Header("Live Values")]
     public float horizontal;
     public float vertical;
+
+    [Header("Button")]
+    public bool selectPressed;      // one-shot: true hanya 1 frame
+    public bool selectHeld;         // true selama tombol ditekan
+
+    [Header("Connection")]
     public bool isConnected = false;
 
     private SerialPort serialPort;
+
+    private bool lastButtonState = false; // state tombol frame sebelumnya
+
+    // =========================================
+    // START
+    // =========================================
 
     void Start()
     {
@@ -26,7 +45,7 @@ public class ESP32Input : MonoBehaviour
         {
             serialPort.Open();
             isConnected = true;
-            Debug.Log("[ESP32Input] Serial Opened on " + portName);
+            Debug.Log("[ESP32Input] Connected to " + portName);
         }
         catch (Exception e)
         {
@@ -35,58 +54,101 @@ public class ESP32Input : MonoBehaviour
         }
     }
 
+    // =========================================
+    // UPDATE
+    // =========================================
+
     void Update()
     {
-        if (serialPort == null || !serialPort.IsOpen) return;
+        // Reset one-shot tiap frame
+        selectPressed = false;
+
+        if (serialPort == null || !serialPort.IsOpen)
+            return;
 
         try
         {
             string data = serialPort.ReadLine();
+
             data = data.Trim().Replace("\r", "").Replace("\n", "");
 
-            if (string.IsNullOrEmpty(data)) return;
+            if (string.IsNullOrEmpty(data))
+                return;
 
+            // FORMAT: x,y,button
             string[] val = data.Split(',');
 
-            // Terima format 2 nilai (x,y) ATAU 3 nilai (x,y,z) dari ESP32
-            if (val.Length >= 2)
+            if (val.Length >= 3)
             {
-                bool okX = float.TryParse(val[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float x);
-                bool okY = float.TryParse(val[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float y);
+                bool okX = float.TryParse(
+                    val[0].Trim(),
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out float x
+                );
+
+                bool okY = float.TryParse(
+                    val[1].Trim(),
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out float y
+                );
+
+                bool okButton = int.TryParse(
+                    val[2].Trim(),
+                    out int btn
+                );
+
+                // =====================================
+                // JOYSTICK
+                // =====================================
 
                 if (okX && okY)
                 {
-                    horizontal = Mathf.Clamp(x, -1f, 1f);
-                    vertical   = Mathf.Clamp(y, -1f, 1f);
-                    // val[2] (misal tombol/z) diabaikan, tambah sendiri kalau perlu
+                    if (Mathf.Abs(x) < joystickSensitivity)
+                        x = 0;
+
+                    if (Mathf.Abs(y) < joystickSensitivity)
+                        y = 0;
+
+                    horizontal = Mathf.Clamp(x * joystickMoveMultiplier, -1f, 1f);
+                    vertical   = Mathf.Clamp(y * joystickMoveMultiplier, -1f, 1f);
                 }
-                else
+
+                // =====================================
+                // BUTTON — one-shot
+                // =====================================
+
+                if (okButton)
                 {
-                    Debug.LogWarning("[ESP32Input] Parse gagal: '" + val[0] + "', '" + val[1] + "'");
+                    bool currentState = (btn == 1);
+
+                    // selectPressed hanya true saat PERTAMA kali ditekan
+                    selectPressed = currentState && !lastButtonState;
+
+                    selectHeld = currentState;
+
+                    lastButtonState = currentState;
                 }
-            }
-            else
-            {
-                Debug.LogWarning("[ESP32Input] Data kurang dari 2 nilai | data: " + data);
             }
         }
-        catch (TimeoutException) { /* normal, abaikan */ }
+        catch (TimeoutException)
+        {
+            // normal
+        }
         catch (Exception e)
         {
-            Debug.LogWarning("[ESP32Input] Read error: " + e.Message);
+            Debug.LogWarning("[ESP32Input] Read Error: " + e.Message);
         }
     }
+
+    // =========================================
+    // CLOSE SERIAL
+    // =========================================
 
     void OnApplicationQuit()
     {
         if (serialPort != null && serialPort.IsOpen)
             serialPort.Close();
-    }
-
-    [ContextMenu("Test Input (0.5, 0.5)")]
-    void TestInput()
-    {
-        horizontal = 0.5f;
-        vertical   = 0.5f;
     }
 }

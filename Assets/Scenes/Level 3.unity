@@ -387,7 +387,7 @@ MonoBehaviour:
   fadeDuration: 3
   popUpCanvasGroup: {fileID: 1939926038}
   timerText: {fileID: 696068086}
-  startingTime: 3
+  startingTime: 20
   audioSource: {fileID: 28775280}
   sfxTimerStart: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
   sfxTimerEnd: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}

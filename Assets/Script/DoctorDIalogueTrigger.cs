@@ -19,6 +19,14 @@ public class DoctorDialogueTrigger : MonoBehaviour
     [Header("Popup")]
     public GameObject popupSprite;
 
+    [Header("Dark Transition SFX")]
+    public AudioSource darkSFXAudioSource;
+
+    public AudioClip darkSFX;
+
+    [Range(0f, 1f)]
+    public float darkSFXVolume = 1f;
+
     private bool triggered = false;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -59,20 +67,35 @@ public class DoctorDialogueTrigger : MonoBehaviour
                 )
             );
 
-            // jeda antar dialogue
-            yield return new WaitForSeconds(
-                doctorDialogues[i].textDelay
-            );
-
             // setelah dialogue ke-2
             if (i == 1)
             {
+                // STOP AMBIENT SFX
+                sceneIntroManager.StopAmbientLoop();
+
                 // dunia jadi gelap
                 if (globalLight != null)
                 {
                     globalLight.intensity = 0.02f;
                 }
+
+                // PLAY DARK SFX
+                if (darkSFXAudioSource != null &&
+                    darkSFX != null)
+                {
+                    darkSFXAudioSource.volume =
+                        darkSFXVolume;
+
+                    darkSFXAudioSource.PlayOneShot(
+                        darkSFX
+                    );
+                }
             }
+
+            // jeda antar dialogue
+            yield return new WaitForSeconds(
+                doctorDialogues[i].textDelay
+            );
         }
 
         // hide dialogue

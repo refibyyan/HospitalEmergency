@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
+using TMPro;
 
 public class QuickDecisionManager : MonoBehaviour
 {
@@ -61,10 +62,17 @@ public class QuickDecisionManager : MonoBehaviour
     [Header("GLOBAL LIGHT")]
     public Light2D globalLight;
 
-    [Header("TIMER")]
+    [Header("MAIN TIMER")]
     public Image timerFill;
 
     public float timerDuration = 15f;
+
+    [Header("MISSION TIMER")]
+    public GameObject timerTemplate;
+
+    public TMP_Text timerText;
+
+    public float missionTimerDuration = 20f;
 
     [Header("AUDIO")]
     public AudioSource audioSource;
@@ -72,6 +80,11 @@ public class QuickDecisionManager : MonoBehaviour
     public AudioClip selectSFX;
     public AudioClip confirmSFX;
     public AudioClip timerSFX;
+
+    [Header("MISSION TIMER AUDIO")]
+    public AudioSource missionTimerAudioSource;
+
+    public AudioClip missionTimerSFX;
 
     // =========================================
     // STATE
@@ -89,6 +102,8 @@ public class QuickDecisionManager : MonoBehaviour
 
     bool triggerUsed = false;
 
+    bool missionTimerRunning = false;
+
     int currentChoice = 0;
 
     int currentPopupButton = 0;
@@ -99,6 +114,8 @@ public class QuickDecisionManager : MonoBehaviour
     // 3 = popup3
 
     float currentTimer;
+
+    float currentMissionTimer;
 
     // =========================================
     // START
@@ -141,6 +158,12 @@ public class QuickDecisionManager : MonoBehaviour
             popupObjGenerator.SetActive(false);
         }
 
+        // TIMER TEMPLATE OFF
+        if (timerTemplate != null)
+        {
+            timerTemplate.SetActive(false);
+        }
+
         UpdateChoiceVisual();
 
         UpdatePopupVisual();
@@ -162,6 +185,12 @@ public class QuickDecisionManager : MonoBehaviour
         if (popupOpened)
         {
             HandlePopupInput();
+        }
+
+        // MISSION TIMER
+        if (missionTimerRunning)
+        {
+            HandleMissionTimer();
         }
     }
 
@@ -244,6 +273,82 @@ public class QuickDecisionManager : MonoBehaviour
     }
 
     // =========================================
+    // MISSION TIMER
+    // =========================================
+
+    void StartMissionTimer()
+    {
+        missionTimerRunning = true;
+
+        currentMissionTimer = missionTimerDuration;
+
+        if (timerTemplate != null)
+        {
+            timerTemplate.SetActive(true);
+        }
+
+        UpdateMissionTimerUI();
+
+        // TIMER SFX LOOP
+        if (missionTimerAudioSource != null &&
+            missionTimerSFX != null)
+        {
+            missionTimerAudioSource.clip = missionTimerSFX;
+
+            missionTimerAudioSource.loop = true;
+
+            missionTimerAudioSource.Play();
+        }
+    }
+
+    void HandleMissionTimer()
+    {
+        currentMissionTimer -= Time.deltaTime;
+
+        UpdateMissionTimerUI();
+
+        if (currentMissionTimer <= 0f)
+        {
+            currentMissionTimer = 0f;
+
+            missionTimerRunning = false;
+
+            StopMissionTimerSFX();
+
+            SceneManager.LoadScene("level 2");
+        }
+    }
+
+    void UpdateMissionTimerUI()
+    {
+        if (timerText != null)
+        {
+            timerText.text =
+                Mathf.CeilToInt(currentMissionTimer).ToString();
+        }
+    }
+
+    void StopMissionTimer()
+    {
+        missionTimerRunning = false;
+
+        if (timerTemplate != null)
+        {
+            timerTemplate.SetActive(false);
+        }
+
+        StopMissionTimerSFX();
+    }
+
+    void StopMissionTimerSFX()
+    {
+        if (missionTimerAudioSource != null)
+        {
+            missionTimerAudioSource.Stop();
+        }
+    }
+
+    // =========================================
     // MAIN INPUT
     // =========================================
 
@@ -311,6 +416,9 @@ public class QuickDecisionManager : MonoBehaviour
                 {
                     playerMovement.canMove = true;
                 }
+
+                // START TIMER
+                StartMissionTimer();
             }
 
             // =====================================
@@ -338,6 +446,9 @@ public class QuickDecisionManager : MonoBehaviour
                 {
                     playerMovement.canMove = true;
                 }
+
+                // START TIMER
+                StartMissionTimer();
             }
 
             // =====================================
@@ -620,6 +731,9 @@ public class QuickDecisionManager : MonoBehaviour
         if (!waitingRestartTrigger)
             return;
 
+        // STOP TIMER
+        StopMissionTimer();
+
         StartCoroutine(RestartLightEvent());
     }
 
@@ -630,6 +744,9 @@ public class QuickDecisionManager : MonoBehaviour
 
         if (!waitingGeneratorTrigger)
             return;
+
+        // STOP TIMER
+        StopMissionTimer();
 
         StartCoroutine(GeneratorEvent());
     }

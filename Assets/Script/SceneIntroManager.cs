@@ -52,7 +52,19 @@ public class SceneIntroManager : MonoBehaviour
     [Header("Popup")]
     public GameObject popupSprite;
 
+    [Header("AMBIENT LOOP SFX")]
+    public AudioSource ambientAudioSource;
+
+    public AudioClip ambientLoopSFX;
+
+    [Range(0f, 1f)]
+    public float ambientVolume = 1f;
+
+    public float ambientDelay = 5f;
+
     private AudioSource dialogueAudioSource;
+
+    private Coroutine ambientCoroutine;
 
     // =========================================
     // AWAKE
@@ -101,6 +113,13 @@ public class SceneIntroManager : MonoBehaviour
         }
 
         // =====================================
+        // START AMBIENT LOOP
+        // =====================================
+
+        ambientCoroutine =
+            StartCoroutine(AmbientLoopRoutine());
+
+        // =====================================
         // FORCE BLACK SCREEN
         // =====================================
 
@@ -108,7 +127,6 @@ public class SceneIntroManager : MonoBehaviour
         {
             fadeImage.gameObject.SetActive(true);
 
-            // biar fade image paling depan
             fadeImage.transform.SetAsLastSibling();
 
             Color color = fadeImage.color;
@@ -121,7 +139,6 @@ public class SceneIntroManager : MonoBehaviour
             fadeImage.color = color;
         }
 
-        // tunggu 1 frame
         yield return null;
 
         yield return new WaitForSeconds(0.5f);
@@ -156,6 +173,57 @@ public class SceneIntroManager : MonoBehaviour
         if (popupSprite != null)
         {
             popupSprite.SetActive(true);
+        }
+    }
+
+    // =========================================
+    // AMBIENT LOOP
+    // =========================================
+
+    IEnumerator AmbientLoopRoutine()
+    {
+        while (true)
+        {
+            if (ambientAudioSource != null &&
+                ambientLoopSFX != null)
+            {
+                ambientAudioSource.clip =
+                    ambientLoopSFX;
+
+                ambientAudioSource.volume =
+                    ambientVolume;
+
+                ambientAudioSource.loop = true;
+
+                ambientAudioSource.Play();
+
+                // LOOP SELAMA 5 DETIK
+                yield return new WaitForSeconds(5f);
+
+                ambientAudioSource.Stop();
+            }
+
+            // JEDA 5 DETIK
+            yield return new WaitForSeconds(
+                ambientDelay
+            );
+        }
+    }
+
+    // =========================================
+    // STOP AMBIENT
+    // =========================================
+
+    public void StopAmbientLoop()
+    {
+        if (ambientCoroutine != null)
+        {
+            StopCoroutine(ambientCoroutine);
+        }
+
+        if (ambientAudioSource != null)
+        {
+            ambientAudioSource.Stop();
         }
     }
 

@@ -2,32 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.SceneManagement;
 
 public class LevelGameplayManager : MonoBehaviour
 {
-    // Struktur data agar Gambar, Teks, dan Durasi Tampil bisa ditambah dinamis di Inspector
-    [System.Serializable]
-    public struct EndingSlide
-    {
-        public Sprite imageSprite;       // Gambar untuk slide ini
-        [TextArea(3, 5)]
-        public string textContent;       // Teks narasi
-        public float displayDuration;    // Berapa lama slide ditumpuk diam setelah teks selesai diketik
-    }
-
     [Header("--- FADE SYSTEM ---")]
     [Tooltip("Masukkan UI Image (FadeImage) yang menutup layar di sini")]
     public CanvasGroup fadeCanvasGroup;
-    [Tooltip("Durasi berapa detik fade out berlangsung")]
+    [Tooltip("Durasi berapa detik fade out berlangsung di awal game")]
     public float fadeDuration = 3.0f;
 
     [Header("--- POP-UP & TIMER SYSTEM ---")]
     [Tooltip("Masukkan Canvas Group dari PopUpObject di sini")]
     public CanvasGroup popUpCanvasGroup;
     [Tooltip("Masukkan TextMeshPro dari TimerText")]
-    public TextMeshProUGUI timerText;
+    public TMPro.TextMeshProUGUI timerText;
     [Tooltip("Durasi waktu mundur dalam detik")]
     public float startingTime = 20f;
     private float currentTime;
@@ -45,33 +34,40 @@ public class LevelGameplayManager : MonoBehaviour
     [Tooltip("Tuliskan NAMA SCENE tujuan berikutnya (harus sama persis huruf besar kecilnya)")]
     public string nextSceneName;
 
-    [Header("--- CUTSCENE ENDING UI SYSTEM ---")]
-    [Tooltip("Masukkan UI Image khusus tempat menampilkan gambar ending (Stretch Full Layar)")]
-    public Image endingImageDisplay;
-    [Tooltip("Masukkan TextMeshPro khusus tempat menampilkan teks ending")]
-    public TextMeshProUGUI endingTextDisplay;
-    [Tooltip("Kecepatan ketik animasi typewriter (makin kecil makin cepat, misal 0.05)")]
-    public float typingSpeed = 0.05f;
-    [Tooltip("Audio klip suara ketikan keyboard/mesin tik")]
-    public AudioClip sfxTyping;
+    [Header("--- BAD ENDING UI ---")]
+    [Tooltip("Masukkan UI Image tempat menampilkan pop up Bad Ending")]
+    public Image badEndingPopupDisplay;
+    [Tooltip("Sprite PopUp saat mendeteksi pilihan RESTART")]
+    public Sprite spritePopupBadRestart;
+    [Tooltip("Sprite PopUp saat mendeteksi pilihan EXIT")]
+    public Sprite spritePopupBadExit;
 
-    [Header("--- GOOD ENDING SLIDES ---")]
-    [Tooltip("Klik '+' untuk menambah urutan gambar dan teks saat masuk Pintu Exit")]
-    public List<EndingSlide> goodEndingSlides = new List<EndingSlide>();
+    [Header("--- GOOD ENDING UI ---")]
+    [Tooltip("Masukkan UI Image tempat menampilkan pop up awal Success")]
+    public Image successPopupDisplay;
+    [Tooltip("Masukkan UI Image Stretch Full Layar khusus tempat slide cerita Good Ending")]
+    public Image goodEndingSlideDisplay;
+    [Tooltip("Masukkan Tombol Transparan Full Layar untuk mendeteksi klik lanjut slide")]
+    public Button slideClickButton;
 
-    [Header("--- BAD ENDING SLIDES ---")]
-    [Tooltip("Klik '+' untuk menambah urutan gambar dan teks saat Timer Habis (00:00)")]
-    public List<EndingSlide> badEndingSlides = new List<EndingSlide>();
+    [Header("--- GOOD ENDING SLIDES DATA ---")]
+    [Tooltip("Klik '+' untuk menambah urutan gambar full-screen setelah pop-up sukses diklik")]
+    public List<Sprite> goodEndingSlides = new List<Sprite>();
+    [Tooltip("Durasi diam (dalam detik) untuk setiap sprite/slide cerita sebelum memudar")]
+    public float slideDisplayDuration = 3.0f;
 
+    // Variabel Kontrol Internal
     private bool isCutscenePlaying = false;
+    private bool isBadEndingActive = false;
+    private bool isSelectingRestart = true; // True = Restart, False = Exit
+    private int currentGoodSlideIndex = -1; // -1 berarti sedang di PopUpSuccess awal
+    private bool isTransitioningSlide = false; // Pengaman agar tidak bisa spam klik saat fade
 
     void Start()
     {
-        // Awal game, sembunyikan Pop-up Timer dan UI Ending
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
-        ResetEndingUI();
+        DeactivateAllEndingUI();
 
-        // Memulai animasi layar hitam memudar
         if (fadeCanvasGroup != null)
         {
             fadeCanvasGroup.alpha = 1f;
@@ -90,14 +86,12 @@ public class LevelGameplayManager : MonoBehaviour
         }
         fadeCanvasGroup.alpha = 0f;
         fadeCanvasGroup.blocksRaycasts = false;
-
         OnFadeOutComplete();
     }
 
     void OnFadeOutComplete()
     {
         if (isCutscenePlaying) return;
-
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 1f;
 
         if (audioSource != null && sfxTimerStart != null)
@@ -127,6 +121,11 @@ public class LevelGameplayManager : MonoBehaviour
                 TimerGameOver();
             }
         }
+
+        if (isBadEndingActive)
+        {
+            HandleBadEndingInput();
+        }
     }
 
     void UpdateTimerDisplay(float timeToDisplay)
@@ -137,29 +136,78 @@ public class LevelGameplayManager : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    // TRIGGER BAD ENDING (Waktu Habis)
+    private void FreezePlayer()
+    {
+        GameObject player = GameObject.Find("lyra_depan");
+        if (player != null)
+        {
+            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+
+            MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour script in scripts)
+            {
+                if (script != this) script.enabled = false;
+            }
+        }
+    }
+
+    // ==========================================
+    // LOGIC: BAD ENDING SYSTEM (TIMER ABIS)
+    // ==========================================
     void TimerGameOver()
     {
         isTimerRunning = false;
         isCutscenePlaying = true;
 
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-            audioSource.loop = false;
-        }
+        if (audioSource != null) { audioSource.Stop(); audioSource.loop = false; }
+        if (sfxTimerEnd != null) audioSource.PlayOneShot(sfxTimerEnd);
 
-        PlaySound(sfxTimerEnd);
-        Debug.Log("Waktu habis! Memulai Bad Ending...");
-
-        // Sembunyikan timer saat cutscene berjalan
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
+        FreezePlayer();
 
-        // Jalankan rangkaian cutscene Bad Ending, lalu restart Level 3
-        StartCoroutine(PlayEndingCutsceneRoutine(badEndingSlides, "Level 3"));
+        StartCoroutine(BadEndingRoutine());
     }
 
-    // TRIGGER GOOD ENDING (Sentuh Pintu Exit)
+    IEnumerator BadEndingRoutine()
+    {
+        yield return StartCoroutine(FadeScreen(0f, 1f, 1.0f));
+
+        if (badEndingPopupDisplay != null)
+        {
+            badEndingPopupDisplay.gameObject.SetActive(true);
+            isSelectingRestart = true;
+            badEndingPopupDisplay.sprite = spritePopupBadRestart;
+        }
+
+        yield return StartCoroutine(FadeScreen(1f, 0f, 1.0f));
+        isBadEndingActive = true;
+    }
+
+    void HandleBadEndingInput()
+    {
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            isSelectingRestart = true;
+            if (badEndingPopupDisplay != null) badEndingPopupDisplay.sprite = spritePopupBadRestart;
+        }
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            isSelectingRestart = false;
+            if (badEndingPopupDisplay != null) badEndingPopupDisplay.sprite = spritePopupBadExit;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+        {
+            isBadEndingActive = false;
+            if (isSelectingRestart) SceneManager.LoadScene("Level 3");
+            else Application.Quit();
+        }
+    }
+
+    // ==========================================
+    // LOGIC: GOOD ENDING SYSTEM (PINTU EXIT)
+    // ==========================================
     public void PlayerReachedExit()
     {
         if (isTimerRunning && !isCutscenePlaying)
@@ -167,118 +215,119 @@ public class LevelGameplayManager : MonoBehaviour
             isTimerRunning = false;
             isCutscenePlaying = true;
 
-            if (audioSource != null)
-            {
-                audioSource.Stop();
-                audioSource.loop = false;
-            }
-
-            Debug.Log("Lyra keluar! Memulai Good Ending...");
-
+            if (audioSource != null) { audioSource.Stop(); audioSource.loop = false; }
             if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
+            FreezePlayer();
 
-            // Jalankan rangkaian cutscene Good Ending, lalu pergi ke MainMenu
-            StartCoroutine(PlayEndingCutsceneRoutine(goodEndingSlides, nextSceneName));
+            StartCoroutine(GoodEndingRoutine());
         }
     }
 
-    // CORE ENGINE: Mengatur jalannya gabungan slide gambar, text typewriter, sfx typing, dan fade
-    IEnumerator PlayEndingCutsceneRoutine(List<EndingSlide> slides, string targetScene)
+    IEnumerator GoodEndingRoutine()
     {
-        // 1. Fade In Layar Hitam Sebelum Gambar Pertama Masuk
-        yield return StartCoroutine(FadeScreen(0f, 1f));
-        ResetEndingUI();
+        // 1. Tutup layar ke hitam penuh
+        yield return StartCoroutine(FadeScreen(0f, 1f, 1.0f));
 
-        // 2. Mainkan satu per satu slide yang sudah didaftarkan di Inspector
-        foreach (EndingSlide slide in slides)
+        // 2. Siapkan UI awal, aktifkan tombol klik rahasia agar bisa diklik/di-enter
+        if (successPopupDisplay != null) successPopupDisplay.gameObject.SetActive(true);
+        if (goodEndingSlideDisplay != null) goodEndingSlideDisplay.gameObject.SetActive(false);
+        if (slideClickButton != null) slideClickButton.gameObject.SetActive(true);
+
+        currentGoodSlideIndex = -1; // Set ke status papan piala sukses
+        isTransitioningSlide = false;
+
+        // 3. Membuka layar hitam untuk memperlihatkan papan sukses
+        yield return StartCoroutine(FadeScreen(1f, 0f, 1.0f));
+    }
+
+    // Fungsi Pintar Utama: Dipanggil saat menekan tombol transparan layar ATAU menekan Enter/Space
+    public void AdvanceToNextGoodSlide()
+    {
+        // Cegah spam klik jika animasi transisinya belum beres
+        if (isTransitioningSlide) return;
+
+        StartCoroutine(PlayGoodSlidesRoutine());
+    }
+
+    IEnumerator PlayGoodSlidesRoutine()
+    {
+        isTransitioningSlide = true;
+        currentGoodSlideIndex++;
+
+        // 1. FADE OUT: Layar pelan-pelan menutup hitam penuh
+        yield return StartCoroutine(FadeScreen(fadeCanvasGroup.alpha, 1f, 0.8f));
+
+        // Matikan pop up sukses awal jika sudah lewat langkah pertama
+        if (successPopupDisplay != null) successPopupDisplay.gameObject.SetActive(false);
+
+        // 2. Periksa apakah gambar sprite cerita berikutnya tersedia di daftar list
+        if (goodEndingSlides != null && currentGoodSlideIndex < goodEndingSlides.Count)
         {
-            // Pasang gambar dan kosongkan teks awal
-            if (endingImageDisplay != null) endingImageDisplay.sprite = slide.imageSprite;
-            if (endingTextDisplay != null) endingTextDisplay.text = "";
+            if (goodEndingSlideDisplay != null)
+            {
+                goodEndingSlideDisplay.gameObject.SetActive(true);
+                // Pasang sprite baru ke bingkai layar
+                goodEndingSlideDisplay.sprite = goodEndingSlides[currentGoodSlideIndex];
+            }
 
-            // Layar hitam memudar terbuka (Memperlihatkan Gambar dan Kotak Teks)
-            yield return StartCoroutine(FadeScreen(1f, 0f));
+            // FADE IN: Layar hitam membuka perlahan menampilkan sprite cerita baru
+            yield return StartCoroutine(FadeScreen(1f, 0f, 0.8f));
+            isTransitioningSlide = false;
 
-            // Jalankan animasi mengetik teks + SFX Typing
-            yield return StartCoroutine(TypeTextRoutine(slide.textContent));
-
-            // Diam beberapa saat sesuai kustom durasi yang kamu tentukan di Inspector
-            yield return new WaitForSeconds(slide.displayDuration);
-
-            // Layar menutup hitam kembali sebelum ganti ke slide berikutnya
-            yield return StartCoroutine(FadeScreen(0f, 1f));
-        }
-
-        // 3. Setelah semua slide habis berjalan, bersihkan UI lalu muat Scene tujuan
-        ResetEndingUI();
-        if (!string.IsNullOrEmpty(targetScene))
-        {
-            SceneManager.LoadScene(targetScene);
+            // DURASI DIAM: Tunggu beberapa detik sesuai durasi yang kamu tentukan di Inspector
+            float elapsed = 0f;
+            while (elapsed < slideDisplayDuration)
+            {
+                // Jika di tengah-tengah durasi player kebelet mencet Enter/Klik, langsung potong durasi diamnya
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+                {
+                    break;
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
         else
         {
-            Debug.LogError("Nama Scene tujuan kosong!");
-            // Pengaman jika lupa isi nama scene, kembalikan ke layar normal
-            yield return StartCoroutine(FadeScreen(1f, 0f));
-            isCutscenePlaying = false;
+            // Jika semua sprite gambar cerita di list sudah habis digunakan, pindah ke MainMenu
+            if (!string.IsNullOrEmpty(nextSceneName))
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                // Pengaman jika kolom nama scene lupa diisi agar tidak nge-hang hitam
+                yield return StartCoroutine(FadeScreen(1f, 0f, 0.5f));
+                DeactivateAllEndingUI();
+                isTransitioningSlide = false;
+            }
         }
     }
 
-    // Animasi Typewriter + Kontrol SFX Typing Mulai & Berhenti otomatis
-    IEnumerator TypeTextRoutine(string fullText)
-    {
-        endingTextDisplay.text = "";
-
-        // Buat AudioSource memutar SFX mengetik secara looping sewaktu teks diketik
-        if (audioSource != null && sfxTyping != null)
-        {
-            audioSource.clip = sfxTyping;
-            audioSource.loop = true;
-            audioSource.Play();
-        }
-
-        foreach (char letter in fullText.ToCharArray())
-        {
-            endingTextDisplay.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
-        }
-
-        // Teks selesai diketik penuh -> Segera MATIKAN suara sfx ketikan
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-            audioSource.loop = false;
-        }
-    }
-
-    // Fungsi pembantu untuk memudarkan layar hitam (Fade In / Fade Out)
-    IEnumerator FadeScreen(float startAlpha, float endAlpha)
+    // ==========================================
+    // UTILITY UTILS
+    // ==========================================
+    IEnumerator FadeScreen(float startAlpha, float endAlpha, float duration)
     {
         if (fadeCanvasGroup == null) yield break;
-
         float timer = 0f;
         fadeCanvasGroup.alpha = startAlpha;
+        fadeCanvasGroup.blocksRaycasts = (endAlpha == 1f);
 
-        while (timer < 1f) // Durasi perpindahan slide sengaja dikunci 1 detik agar pas
+        while (timer < duration)
         {
             timer += Time.deltaTime;
-            fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / 1f);
+            fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
             yield return null;
         }
         fadeCanvasGroup.alpha = endAlpha;
     }
 
-    void ResetEndingUI()
+    void DeactivateAllEndingUI()
     {
-        if (endingImageDisplay != null) endingImageDisplay.sprite = null;
-        if (endingTextDisplay != null) endingTextDisplay.text = "";
-    }
-
-    void PlaySound(AudioClip clip)
-    {
-        if (audioSource != null && clip != null)
-        {
-            audioSource.PlayOneShot(clip);
-        }
+        if (badEndingPopupDisplay != null) badEndingPopupDisplay.gameObject.SetActive(false);
+        if (successPopupDisplay != null) successPopupDisplay.gameObject.SetActive(false);
+        if (goodEndingSlideDisplay != null) goodEndingSlideDisplay.gameObject.SetActive(false);
+        if (slideClickButton != null) slideClickButton.gameObject.SetActive(false);
     }
 }

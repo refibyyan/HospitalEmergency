@@ -9,6 +9,11 @@ public class MekanikDecision : MonoBehaviour
     public Image cardKiriUI;
     public Image cardKananUI;
 
+[Header("SFX")]
+public AudioSource audioSource;
+public AudioClip chooseClick;
+public AudioClip berhasilLevel;
+
     [Header("Sprite Card Kiri")]
     public Sprite gambarKiriIjo;
     public Sprite gambarKiriPolos;
@@ -130,27 +135,33 @@ public class MekanikDecision : MonoBehaviour
     }
 
     void InputPilihan()
+{
+    if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-        {
-            pilihKiri = true;
-            UpdatePilihanCard();
-        }
+        pilihKiri = true;
+        UpdatePilihanCard();
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-        {
-            pilihKiri = false;
-            UpdatePilihanCard();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
-        {
-            if (pilihKiri)
-                Menang();
-            else
-                TriggerGameOver();
-        }
+        if (audioSource != null && chooseClick != null)
+            audioSource.PlayOneShot(chooseClick);
     }
+
+    if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+    {
+        pilihKiri = false;
+        UpdatePilihanCard();
+
+        if (audioSource != null && chooseClick != null)
+            audioSource.PlayOneShot(chooseClick);
+    }
+
+    if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+    {
+        if (pilihKiri)
+            Menang();
+        else
+            TriggerGameOver();
+    }
+}
 
     void UpdatePilihanCard()
     {
@@ -167,24 +178,30 @@ public class MekanikDecision : MonoBehaviour
     }
 
     public void Menang()
-    {
-        if (gameSelesai) return;
+{
+    if (gameSelesai) return;
 
-        gameSelesai = true;
+    gameSelesai = true;
 
-        Debug.Log("MENANG!");
+    if (audioSource != null && berhasilLevel != null)
+        audioSource.PlayOneShot(berhasilLevel);
 
-        if (winPanel != null)
-            winPanel.SetActive(true);
+    Debug.Log("MENANG!");
 
-        Time.timeScale = 0f;
-    }
+    if (winPanel != null)
+        winPanel.SetActive(true);
 
-    void LanjutLevel2()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("Level2");
-    }
+    Time.timeScale = 0f;
+}
+
+   void LanjutLevel2()
+{
+    if (audioSource != null && chooseClick != null)
+        audioSource.PlayOneShot(chooseClick);
+
+    Time.timeScale = 1f;
+    SceneManager.LoadScene("Level2");
+}
 
     void TriggerGameOver()
     {

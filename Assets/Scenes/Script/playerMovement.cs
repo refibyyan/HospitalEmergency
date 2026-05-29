@@ -13,6 +13,10 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private Vector2 moveInput;
 
+    [Header("SFX")]
+    public AudioSource footstepSource;
+    public AudioClip derapLangkah;
+
     public bool canMove = true;
 
     void Start()
@@ -30,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
         {
             moveInput = Vector2.zero;
             UpdateAnimator();
+            HandleFootstepSound();
             return;
         }
 
@@ -85,5 +90,29 @@ public class PlayerMovement : MonoBehaviour
     public void SetExternalInput(Vector2 input)
     {
         moveInput = Vector2.ClampMagnitude(input, 1f);
+    }
+    private void HandleFootstepSound()
+    {
+        bool isWalking = moveInput != Vector2.zero;
+
+        if (isWalking)
+        {
+            if (footstepSource != null &&
+                derapLangkah != null &&
+                !footstepSource.isPlaying)
+            {
+                footstepSource.clip = derapLangkah;
+                footstepSource.loop = true;
+                footstepSource.Play();
+            }
+        }
+        else
+        {
+            if (footstepSource != null &&
+                footstepSource.isPlaying)
+            {
+                footstepSource.Stop();
+            }
+        }
     }
 }

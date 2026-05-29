@@ -2611,6 +2611,7 @@ MonoBehaviour:
   continueOFF: {fileID: 21300000, guid: 6b4dcc788497b2d45bc16724a914f101, type: 3}
   continueON: {fileID: 21300000, guid: 6b4dcc788497b2d45bc16724a914f101, type: 3}
   playerMovement: {fileID: 1014859213}
+  esp32Input: {fileID: 1336845849}
   globalLight: {fileID: 1146281645}
   timerFill: {fileID: 1434319723}
   timerDuration: 15
@@ -7585,8 +7586,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
   portName: COM5
   baudRate: 115200
+  joystickSensitivity: 0.5
+  joystickMoveMultiplier: 0.5
   horizontal: 0
   vertical: 0
+  selectPressed: 0
+  selectHeld: 0
   isConnected: 1
 --- !u!4 &1336845850
 Transform:

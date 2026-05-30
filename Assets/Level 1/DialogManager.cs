@@ -9,29 +9,31 @@ public class DialogManager : MonoBehaviour
     public TextMeshProUGUI textMeshPro;
     public float typingSpeed = 0.05f;
 
+    [Header("Typing SFX")]
+    public AudioSource typingSource;
+    public AudioClip typingSFX;
+
     [Header("Waktu Jeda Awal (Detik)")]
-    public float startDelay = 2.0f; // <--- Kamu bisa ganti angka jedanya di Inspector nanti!
+    public float startDelay = 2.0f;
 
     [Header("Isi Dialog")]
     [TextArea(3, 5)]
     public string[] dialogLines;
+
+    private Coroutine typingCoroutine;
     private int index;
 
     void Start()
     {
-        // Gak langsung jalan, tapi kita suruh Unity nunggu dulu sesuai startDelay
         StartCoroutine(WaitBeforeStart());
     }
 
     IEnumerator WaitBeforeStart()
     {
-        // Sembunyikan dulu kotak dialog selama jeda
         dialogBox.SetActive(false);
 
-        // Tunggu selama 2 detik (atau sesuai angka startDelay)
         yield return new WaitForSeconds(startDelay);
 
-        // Setelah nunggu, baru jalankan dialognya!
         StartDialog();
     }
 
@@ -39,22 +41,32 @@ public class DialogManager : MonoBehaviour
     {
         dialogBox.SetActive(true);
         index = 0;
-        StartCoroutine(TypeLine());
+
+        typingCoroutine = StartCoroutine(TypeLine());
     }
 
     IEnumerator TypeLine()
     {
         textMeshPro.text = "";
+
         foreach (char c in dialogLines[index].ToCharArray())
         {
             textMeshPro.text += c;
+
+            if (typingSource != null &&
+                typingSFX != null &&
+                c != ' ' &&
+                !typingSource.isPlaying)
+            {
+                typingSource.PlayOneShot(typingSFX);
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
     }
 
     void Update()
     {
-        // Sekarang tombolnya mendeteksi Enter (Return) atau Klik Kiri Mouse
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
         {
             if (textMeshPro.text == dialogLines[index])
@@ -63,9 +75,17 @@ public class DialogManager : MonoBehaviour
             }
             else
             {
-                // Kalau lagi ngetik terus ditekan Enter, langsung munculin semua hurufnya
-                StopAllCoroutines();
+                if (typingCoroutine != null)
+                {
+                    StopCoroutine(typingCoroutine);
+                }
+
                 textMeshPro.text = dialogLines[index];
+
+                if (typingSource != null)
+                {
+                    typingSource.Stop();
+                }
             }
         }
     }
@@ -75,12 +95,24 @@ public class DialogManager : MonoBehaviour
         if (index < dialogLines.Length - 1)
         {
             index++;
-            StartCoroutine(TypeLine());
+
+            if (typingSource != null)
+            {
+                typingSource.Stop();
+            }
+
+            typingCoroutine = StartCoroutine(TypeLine());
         }
         else
         {
+            if (typingSource != null)
+            {
+                typingSource.Stop();
+            }
+
             dialogBox.SetActive(false);
             textMeshPro.text = "";
+
             Debug.Log("Dialog Selesai! Pemain sekarang bisa jalan.");
         }
     }

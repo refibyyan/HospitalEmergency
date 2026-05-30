@@ -8,25 +8,21 @@ public class LevelGameplayManager : MonoBehaviour
 {
     [Header("--- FADE SYSTEM ---")]
     public CanvasGroup fadeCanvasGroup;
-
     public float fadeDuration = 3f;
 
     [Header("--- POPUP & TIMER SYSTEM ---")]
     public CanvasGroup popUpCanvasGroup;
-
     public TMPro.TextMeshProUGUI timerText;
-
     public float startingTime = 20f;
-
     private float currentTime;
-
     private bool isTimerRunning = false;
+
+    [HideInInspector]
+    public bool timerHasStarted = false;
 
     [Header("--- AUDIO SYSTEM ---")]
     public AudioSource audioSource;
-
     public AudioClip sfxTimerStart;
-
     public AudioClip sfxTimerEnd;
 
     [Header("--- SCENE / EXIT SYSTEM ---")]
@@ -34,33 +30,26 @@ public class LevelGameplayManager : MonoBehaviour
 
     [Header("--- BAD ENDING UI ---")]
     public Image badEndingPopupDisplay;
-
     public Sprite spritePopupBadRestart;
-
     public Sprite spritePopupBadExit;
 
-    [Header("--- GOOD ENDING UI ---")]
-    [Tooltip("CUMA 1 IMAGE INI AJA YANG DIPAKE")]
+    [Header("--- SUCCESS POPUP ---")]
     public Image successPopupDisplay;
 
-    [Tooltip("ISI SEMUA SLIDE GOOD ENDING DISINI")]
-    public List<Sprite> goodEndingSlides =
-        new List<Sprite>();
+    [Header("--- ENDING DISPLAY ---")]
+    public Image endingDisplay;
+    public List<Sprite> endingSlides = new List<Sprite>();
 
-    [Tooltip("DURASI TIAP SLIDE")]
+    [Tooltip("DURASI TIAP SLIDE ENDING")]
     public float slideDisplayDuration = 3f;
 
     // =====================================
     // INTERNAL
     // =====================================
-
     private bool isCutscenePlaying = false;
-
     private bool isBadEndingActive = false;
-
     private bool isSelectingRestart = true;
-
-    private bool isPlayingSlides = false;
+    private bool waitingSuccessInput = false;
 
     void Start()
     {
@@ -74,7 +63,6 @@ public class LevelGameplayManager : MonoBehaviour
         if (fadeCanvasGroup != null)
         {
             fadeCanvasGroup.alpha = 1f;
-
             StartCoroutine(FadeOutRoutine());
         }
     }
@@ -86,21 +74,12 @@ public class LevelGameplayManager : MonoBehaviour
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
-
-            fadeCanvasGroup.alpha =
-                Mathf.Lerp(
-                    1f,
-                    0f,
-                    timer / fadeDuration
-                );
-
+            fadeCanvasGroup.alpha = Mathf.Lerp(1f, 0f, timer / fadeDuration);
             yield return null;
         }
 
         fadeCanvasGroup.alpha = 0f;
-
         fadeCanvasGroup.blocksRaycasts = false;
-
         OnFadeOutComplete();
     }
 
@@ -109,24 +88,14 @@ public class LevelGameplayManager : MonoBehaviour
         if (isCutscenePlaying)
             return;
 
-        if (popUpCanvasGroup != null)
+        if (timerText != null)
         {
-            popUpCanvasGroup.alpha = 1f;
+            timerText.text = string.Format(
+                "{0:00}:{1:00}",
+                Mathf.FloorToInt(startingTime / 60),
+                Mathf.FloorToInt(startingTime % 60)
+            );
         }
-
-        if (audioSource != null &&
-            sfxTimerStart != null)
-        {
-            audioSource.clip = sfxTimerStart;
-
-            audioSource.loop = true;
-
-            audioSource.Play();
-        }
-
-        currentTime = startingTime;
-
-        isTimerRunning = true;
     }
 
     void Update()
@@ -134,21 +103,17 @@ public class LevelGameplayManager : MonoBehaviour
         // =====================================
         // TIMER
         // =====================================
-
         if (isTimerRunning)
         {
             if (currentTime > 0)
             {
                 currentTime -= Time.deltaTime;
-
                 UpdateTimerDisplay(currentTime);
             }
             else
             {
                 currentTime = 0;
-
                 UpdateTimerDisplay(currentTime);
-
                 TimerGameOver();
             }
         }
@@ -156,7 +121,6 @@ public class LevelGameplayManager : MonoBehaviour
         // =====================================
         // BAD ENDING INPUT
         // =====================================
-
         if (isBadEndingActive)
         {
             HandleBadEndingInput();
@@ -170,37 +134,26 @@ public class LevelGameplayManager : MonoBehaviour
             timeToDisplay = 0;
         }
 
-        int minutes =
-            Mathf.FloorToInt(timeToDisplay / 60);
+        int minutes = Mathf.FloorToInt(timeToDisplay / 60);
+        int seconds = Mathf.FloorToInt(timeToDisplay % 60);
 
-        int seconds =
-            Mathf.FloorToInt(timeToDisplay % 60);
-
-        timerText.text =
-            string.Format(
-                "{0:00}:{1:00}",
-                minutes,
-                seconds
-            );
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     void FreezePlayer()
     {
-        GameObject player =
-            GameObject.Find("lyra_depan");
+        GameObject player = GameObject.Find("lyra_depan");
 
         if (player != null)
         {
-            Rigidbody2D rb =
-                player.GetComponent<Rigidbody2D>();
+            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
 
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
             }
 
-            MonoBehaviour[] scripts =
-                player.GetComponents<MonoBehaviour>();
+            MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
 
             foreach (MonoBehaviour script in scripts)
             {
@@ -215,25 +168,15 @@ public class LevelGameplayManager : MonoBehaviour
     // =====================================
     // BAD ENDING
     // =====================================
-
     void TimerGameOver()
     {
         isTimerRunning = false;
-
         isCutscenePlaying = true;
 
         if (audioSource != null)
         {
             audioSource.Stop();
-
             audioSource.loop = false;
-        }
-
-        if (sfxTimerEnd != null)
-        {
-            audioSource.PlayOneShot(
-                sfxTimerEnd
-            );
         }
 
         if (popUpCanvasGroup != null)
@@ -241,72 +184,58 @@ public class LevelGameplayManager : MonoBehaviour
             popUpCanvasGroup.alpha = 0f;
         }
 
-        FreezePlayer();
+        if (audioSource != null && sfxTimerEnd != null)
+        {
+            audioSource.PlayOneShot(sfxTimerEnd);
+        }
 
+        FreezePlayer();
         StartCoroutine(BadEndingRoutine());
     }
 
     IEnumerator BadEndingRoutine()
     {
-        yield return StartCoroutine(
-            FadeScreen(0f, 1f, 1f)
-        );
+        yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
         if (badEndingPopupDisplay != null)
         {
-            badEndingPopupDisplay
-                .gameObject
-                .SetActive(true);
-
+            badEndingPopupDisplay.gameObject.SetActive(true);
             isSelectingRestart = true;
-
-            badEndingPopupDisplay.sprite =
-                spritePopupBadRestart;
+            badEndingPopupDisplay.sprite = spritePopupBadRestart;
         }
 
-        yield return StartCoroutine(
-            FadeScreen(1f, 0f, 1f)
-        );
-
+        yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
         isBadEndingActive = true;
     }
 
     void HandleBadEndingInput()
     {
-        if (Input.GetKeyDown(KeyCode.A) ||
-            Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             isSelectingRestart = true;
 
             if (badEndingPopupDisplay != null)
             {
-                badEndingPopupDisplay.sprite =
-                    spritePopupBadRestart;
+                badEndingPopupDisplay.sprite = spritePopupBadRestart;
             }
         }
-
-        else if (Input.GetKeyDown(KeyCode.D) ||
-                 Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             isSelectingRestart = false;
 
             if (badEndingPopupDisplay != null)
             {
-                badEndingPopupDisplay.sprite =
-                    spritePopupBadExit;
+                badEndingPopupDisplay.sprite = spritePopupBadExit;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) ||
-            Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             isBadEndingActive = false;
 
             if (isSelectingRestart)
             {
-                SceneManager.LoadScene(
-                    "Level 3"
-                );
+                SceneManager.LoadScene("Level 3");
             }
             else
             {
@@ -318,7 +247,6 @@ public class LevelGameplayManager : MonoBehaviour
     // =====================================
     // GOOD ENDING
     // =====================================
-
     public void PlayerReachedExit()
     {
         if (!isTimerRunning)
@@ -328,13 +256,11 @@ public class LevelGameplayManager : MonoBehaviour
             return;
 
         isTimerRunning = false;
-
         isCutscenePlaying = true;
 
         if (audioSource != null)
         {
             audioSource.Stop();
-
             audioSource.loop = false;
         }
 
@@ -344,132 +270,127 @@ public class LevelGameplayManager : MonoBehaviour
         }
 
         FreezePlayer();
-
         StartCoroutine(GoodEndingRoutine());
     }
 
     IEnumerator GoodEndingRoutine()
     {
-        // FADE KE HITAM
-        yield return StartCoroutine(
-            FadeScreen(0f, 1f, 1f)
-        );
+        yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
-        // TAMPILKAN IMAGE
         if (successPopupDisplay != null)
         {
-            successPopupDisplay
-                .gameObject
-                .SetActive(true);
+            successPopupDisplay.gameObject.SetActive(true);
         }
 
-        // FADE BUKA
-        yield return StartCoroutine(
-            FadeScreen(1f, 0f, 1f)
-        );
+        yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
+        waitingSuccessInput = true;
 
-        // AUTO MAINKAN SLIDE
-        StartCoroutine(
-            PlayGoodEndingSlides()
-        );
-    }
-
-    IEnumerator PlayGoodEndingSlides()
-    {
-        if (isPlayingSlides)
-            yield break;
-
-        isPlayingSlides = true;
-
-        for (int i = 0;
-             i < goodEndingSlides.Count;
-             i++)
+        while (waitingSuccessInput)
         {
-            // FADE TUTUP
-            yield return StartCoroutine(
-                FadeScreen(0f, 1f, 0.7f)
-            );
-
-            // GANTI SPRITE
-            if (successPopupDisplay != null)
+            if (Input.GetKeyDown(KeyCode.Return) ||
+                Input.GetKeyDown(KeyCode.Space) ||
+                Input.GetMouseButtonDown(0))
             {
-                successPopupDisplay.sprite =
-                    goodEndingSlides[i];
+                waitingSuccessInput = false;
             }
 
-            // FADE BUKA
-            yield return StartCoroutine(
-                FadeScreen(1f, 0f, 0.7f)
-            );
-
-            // TUNGGU OTOMATIS
-            yield return new WaitForSeconds(
-                slideDisplayDuration
-            );
+            yield return null;
         }
 
-        // PINDAH SCENE
+        if (successPopupDisplay != null)
+        {
+            successPopupDisplay.gameObject.SetActive(false);
+        }
+
+        StartCoroutine(PlayEndingSlides());
+    }
+
+    IEnumerator PlayEndingSlides()
+    {
+        if (endingDisplay == null)
+            yield break;
+
+        endingDisplay.gameObject.SetActive(true);
+
+        for (int i = 0; i < endingSlides.Count; i++)
+        {
+            yield return StartCoroutine(FadeScreen(0f, 1f, 0.7f));
+            endingDisplay.sprite = endingSlides[i];
+            yield return StartCoroutine(FadeScreen(1f, 0f, 0.7f));
+
+            yield return new WaitForSeconds(slideDisplayDuration);
+        }
+
+        yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
+
         if (!string.IsNullOrEmpty(nextSceneName))
         {
-            SceneManager.LoadScene(
-                nextSceneName
-            );
+            SceneManager.LoadScene(nextSceneName);
         }
     }
 
     // =====================================
     // FADE
     // =====================================
-
-    IEnumerator FadeScreen(
-        float startAlpha,
-        float endAlpha,
-        float duration
-    )
+    IEnumerator FadeScreen(float startAlpha, float endAlpha, float duration)
     {
         if (fadeCanvasGroup == null)
             yield break;
 
         float timer = 0f;
-
-        fadeCanvasGroup.alpha =
-            startAlpha;
-
-        fadeCanvasGroup.blocksRaycasts =
-            (endAlpha == 1f);
+        fadeCanvasGroup.alpha = startAlpha;
+        fadeCanvasGroup.blocksRaycasts = (endAlpha == 1f);
 
         while (timer < duration)
         {
             timer += Time.deltaTime;
-
-            fadeCanvasGroup.alpha =
-                Mathf.Lerp(
-                    startAlpha,
-                    endAlpha,
-                    timer / duration
-                );
-
+            fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
             yield return null;
         }
 
-        fadeCanvasGroup.alpha =
-            endAlpha;
+        fadeCanvasGroup.alpha = endAlpha;
     }
 
     void DeactivateAllEndingUI()
     {
         if (badEndingPopupDisplay != null)
         {
-            badEndingPopupDisplay
-                .gameObject
-                .SetActive(false);
+            badEndingPopupDisplay.gameObject.SetActive(false);
         }
 
         if (successPopupDisplay != null)
         {
-            successPopupDisplay
-                .gameObject
-                .SetActive(false);
+            successPopupDisplay.gameObject.SetActive(false);
         }
+
+        if (endingDisplay != null)
+        {
+            endingDisplay.gameObject.SetActive(false);
+        }
+    }
+
+    public void StartTimerAfterPotDialogue()
+    {
+        if (timerHasStarted)
+            return;
+
+        timerHasStarted = true;
+        currentTime = startingTime;
+
+        if (popUpCanvasGroup != null)
+        {
+            popUpCanvasGroup.alpha = 1f;
+        }
+
+        isTimerRunning = true;
+
+        if (audioSource != null && sfxTimerStart != null)
+        {
+            audioSource.clip = sfxTimerStart;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
+
+        UpdateTimerDisplay(currentTime);
     }
 }

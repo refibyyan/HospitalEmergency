@@ -844,8 +844,8 @@ MonoBehaviour:
   berhasilLevel: {fileID: 8300000, guid: 7ca09b1e27238564f9cbcc0ab6cfb087, type: 3}
   gambarKiriIjo: {fileID: -8795594310455231853, guid: b3807c0d2989a434eb02baba7c52a617, type: 3}
   gambarKiriPolos: {fileID: -3424827064934156760, guid: 2a779edbeb34d7f40a8362c544392ef0, type: 3}
-  gambarKananIjo: {fileID: -8464749129216593372, guid: 1bb0e1f910411e041b8a3e835adbe2a3, type: 3}
-  gambarKananPolos: {fileID: 1329003711367981555, guid: 9dc241f640f5a854ab252b16b8b2d2e2, type: 3}
+  gambarKananIjo: {fileID: -366575602748004827, guid: 0b63892fab864ce40ba2e89863478f63, type: 3}
+  gambarKananPolos: {fileID: 9010811196934502220, guid: 4237a9aa72f81634f9fc4d473cb92b94, type: 3}
   barMerahTimer: {fileID: 1954247138}
   teksCountdown: {fileID: 1799343927}
   waktuMaksimal: 15

@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 1bb0e1f910411e041b8a3e835adbe2a3
+guid: 4237a9aa72f81634f9fc4d473cb92b94
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4031564604880626460
-    second: Group 13_0
-  - first:
-      213: -8464749129216593372
-    second: Group 13_1
+      213: 9010811196934502220
+    second: Group 58_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -125,64 +122,16 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Group 13_0
+      name: Group 58_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 398
-        width: 26
-        height: 47
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c13a2f2e5aef2f730800000000000000
-      internalID: 4031564604880626460
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Group 13_1
-      rect:
-        serializedVersion: 2
-        x: 48
         y: 0
-        width: 492
+        width: 493
         height: 472
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -192,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4227f30e38b278a80800000000000000
-      internalID: -8464749129216593372
+      spriteID: c47b463da05dc0d70800000000000000
+      internalID: 9010811196934502220
       vertices: []
       indices: 
       edges: []
@@ -202,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -212,8 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Group 13_0: 4031564604880626460
-      Group 13_1: -8464749129216593372
+      Group 58_0: 9010811196934502220
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

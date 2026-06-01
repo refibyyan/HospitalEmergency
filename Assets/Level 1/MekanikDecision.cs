@@ -213,16 +213,18 @@ public AudioClip monitorJantung;
     Time.timeScale = 0f;
 }
 
-   void LanjutLevel2()
-{
-    if (audioSource != null && chooseClick != null)
-        audioSource.PlayOneShot(chooseClick);
+    void LanjutLevel2()
+    {
+        if (audioSource != null && chooseClick != null)
+            audioSource.PlayOneShot(chooseClick);
 
-    Time.timeScale = 1f;
-    SceneManager.LoadScene("Level2");
-}
+        Time.timeScale = 1f;
 
-void TriggerGameOver()
+        // Memanggil scene sesuai nama di folder Assets kamu
+        SceneManager.LoadScene("Loading 1 to 2");
+    }
+
+    void TriggerGameOver()
 {
     if (isGameOverActive) return;
 

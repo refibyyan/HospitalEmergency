@@ -24,6 +24,8 @@ public class LevelGameplayManager : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip sfxTimerStart;
     public AudioClip sfxTimerEnd;
+    public AudioClip sfxSuccessPopUp;
+    public AudioClip sfxSuccessConfirm;
 
     [Header("--- SCENE / EXIT SYSTEM ---")]
     public string nextSceneName;
@@ -35,6 +37,7 @@ public class LevelGameplayManager : MonoBehaviour
 
     [Header("--- SUCCESS POPUP ---")]
     public Image successPopupDisplay;
+    public CanvasGroup successPopupBackground;
 
     [Header("--- ENDING DISPLAY ---")]
     public Image endingDisplay;
@@ -42,6 +45,12 @@ public class LevelGameplayManager : MonoBehaviour
 
     [Tooltip("DURASI TIAP SLIDE ENDING")]
     public float slideDisplayDuration = 3f;
+
+    // =====================================
+    // KONSTANTA ALPHA TARGET FADEIMAGE
+    // Alpha 250 (skala 0-255) = 250f / 255f dalam Unity
+    // =====================================
+    private const float FADE_IMAGE_TARGET_ALPHA = 250f / 255f; // ~0.9804f
 
     // =====================================
     // INTERNAL
@@ -125,6 +134,15 @@ public class LevelGameplayManager : MonoBehaviour
         {
             HandleBadEndingInput();
         }
+
+        // =====================================
+        // PAKSA ALPHA FADEIMAGE SELAMA SUCCESS POPUP AKTIF
+        // Ini jaminan agar Unity tidak bisa mereset nilai alpha
+        // =====================================
+        if (waitingSuccessInput && successPopupBackground != null)
+        {
+            successPopupBackground.alpha = FADE_IMAGE_TARGET_ALPHA;
+        }
     }
 
     void UpdateTimerDisplay(float timeToDisplay)
@@ -195,10 +213,8 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator BadEndingRoutine()
     {
-        // 1. Layar menutup total (Alpha jadi 1)
         yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
-        // 2. Aktifkan Popup bad ending di belakang layar hitam
         if (badEndingPopupDisplay != null)
         {
             badEndingPopupDisplay.gameObject.SetActive(true);
@@ -206,10 +222,8 @@ public class LevelGameplayManager : MonoBehaviour
             badEndingPopupDisplay.sprite = spritePopupBadRestart;
         }
 
-        // 3. Layar membuka kembali (Alpha jadi 0)
         yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
-        
-        // JAMINAN: Matikan paksa alpha & raycast panel fade agar tidak memblokir visual popup di bawahnya
+
         if (fadeCanvasGroup != null)
         {
             fadeCanvasGroup.alpha = 0f;
@@ -221,7 +235,6 @@ public class LevelGameplayManager : MonoBehaviour
 
     void HandleBadEndingInput()
     {
-        // Tekan A atau Panah Kiri -> Pilih RESTART
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             isSelectingRestart = true;
@@ -231,7 +244,6 @@ public class LevelGameplayManager : MonoBehaviour
                 badEndingPopupDisplay.sprite = spritePopupBadRestart;
             }
         }
-        // Tekan D atau Panah Kanan -> Pilih EXIT
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             isSelectingRestart = false;
@@ -242,22 +254,18 @@ public class LevelGameplayManager : MonoBehaviour
             }
         }
 
-        // Tekan Enter atau Space untuk konfirmasi pilihan
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             isBadEndingActive = false;
 
             if (isSelectingRestart)
             {
-                // Load ulang level permainan
                 SceneManager.LoadScene("Level 3");
             }
             else
             {
-                // Keluar dari aplikasi game
                 Application.Quit();
 #if UNITY_EDITOR
-                // Jika running di Unity Editor, stop mode play secara otomatis
                 UnityEditor.EditorApplication.isPlaying = false;
 #endif
             }
@@ -295,31 +303,83 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator GoodEndingRoutine()
     {
+        // 1. Layar menutup total ke hitam (Tirai Utama)
         yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
+        // 2. Aktifkan SuccessPopup teks (di depan)
         if (successPopupDisplay != null)
         {
             successPopupDisplay.gameObject.SetActive(true);
+            successPopupDisplay.transform.SetAsLastSibling();
         }
 
-        yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
+        // 3. Paksa aktifkan SuccessFadeBackground Baru dan reset alpha ke 0
+        if (successPopupBackground != null)
+        {
+            successPopupBackground.gameObject.SetActive(true);
+            successPopupBackground.alpha = 0f;
+            successPopupBackground.blocksRaycasts = true;
+            successPopupBackground.transform.SetSiblingIndex(
+                successPopupDisplay.transform.GetSiblingIndex() - 1
+            );
+        }
+
+        // 4. Mainkan SFX muncul
+        if (audioSource != null && sfxSuccessPopUp != null)
+        {
+            audioSource.PlayOneShot(sfxSuccessPopUp);
+        }
+
+        // 5. MODIFIKASI: Kecepatan tirai hitam membuka (1f -> 0f) diset 1 detik,
+        //    Sedangkan background baru (0f -> 250) langsung ngebut selesai dalam 0.2 detik!
+        yield return StartCoroutine(FadeScreenAndBackground(
+            screenStart: 1f,
+            screenEnd:   0f,
+            bgStart:     0f,
+            bgEnd:       FADE_IMAGE_TARGET_ALPHA,
+            duration:    1f,
+            bgDuration:  0.2f // <-- Parameter baru untuk kecepatan background hitam
+        ));
+
+        // 6. JAMINAN: ikat paksa alpha agar tidak bisa balik ke 0
+        if (successPopupBackground != null)
+        {
+            successPopupBackground.alpha = FADE_IMAGE_TARGET_ALPHA;
+        }
+
+        // 7. Mulai menunggu input player
         waitingSuccessInput = true;
 
         while (waitingSuccessInput)
         {
             if (Input.GetKeyDown(KeyCode.Return) ||
-                Input.GetKeyDown(KeyCode.Space) ||
+                Input.GetKeyDown(KeyCode.Space)  ||
                 Input.GetMouseButtonDown(0))
             {
+                if (audioSource != null && sfxSuccessConfirm != null)
+                {
+                    audioSource.PlayOneShot(sfxSuccessConfirm);
+                }
                 waitingSuccessInput = false;
             }
 
             yield return null;
         }
 
+        // 8. Jeda kecil agar SFX confirm sempat terdengar
+        yield return new WaitForSeconds(0.2f);
+
+        // 9. Sembunyikan sukses popup setelah input
         if (successPopupDisplay != null)
         {
             successPopupDisplay.gameObject.SetActive(false);
+        }
+
+        if (successPopupBackground != null)
+        {
+            successPopupBackground.alpha = 0f;
+            successPopupBackground.blocksRaycasts = false;
+            successPopupBackground.gameObject.SetActive(false);
         }
 
         StartCoroutine(PlayEndingSlides());
@@ -350,7 +410,7 @@ public class LevelGameplayManager : MonoBehaviour
     }
 
     // =====================================
-    // FADE
+    // FADE FUNCTIONS
     // =====================================
     IEnumerator FadeScreen(float startAlpha, float endAlpha, float duration)
     {
@@ -371,6 +431,47 @@ public class LevelGameplayManager : MonoBehaviour
         fadeCanvasGroup.alpha = endAlpha;
     }
 
+    // Sistem Interpolasi Ganda dengan kontrol durasi terpisah
+    IEnumerator FadeScreenAndBackground(float screenStart, float screenEnd,
+                                         float bgStart,     float bgEnd,
+                                         float duration,    float bgDuration)
+    {
+        float timer = 0f;
+
+        if (fadeCanvasGroup != null)        fadeCanvasGroup.alpha        = screenStart;
+        if (successPopupBackground != null) successPopupBackground.alpha = bgStart;
+
+        while (timer < duration || timer < bgDuration)
+        {
+            timer += Time.deltaTime;
+
+            // Transisi Tirai Utama
+            if (fadeCanvasGroup != null && timer <= duration)
+            {
+                fadeCanvasGroup.alpha = Mathf.Lerp(screenStart, screenEnd, timer / duration);
+            }
+
+            // Transisi Kilat Background Sukses (0.2 Detik!)
+            if (successPopupBackground != null && timer <= bgDuration)
+            {
+                successPopupBackground.alpha = Mathf.Lerp(bgStart, bgEnd, timer / bgDuration);
+            }
+
+            yield return null;
+        }
+
+        if (fadeCanvasGroup != null)
+        {
+            fadeCanvasGroup.alpha = screenEnd;
+            fadeCanvasGroup.blocksRaycasts = (screenEnd == 1f);
+        }
+
+        if (successPopupBackground != null)
+        {
+            successPopupBackground.alpha = bgEnd;
+        }
+    }
+
     void DeactivateAllEndingUI()
     {
         if (badEndingPopupDisplay != null)
@@ -381,6 +482,13 @@ public class LevelGameplayManager : MonoBehaviour
         if (successPopupDisplay != null)
         {
             successPopupDisplay.gameObject.SetActive(false);
+        }
+
+        if (successPopupBackground != null)
+        {
+            successPopupBackground.gameObject.SetActive(false);
+            successPopupBackground.alpha = 0f;
+            successPopupBackground.blocksRaycasts = false;
         }
 
         if (endingDisplay != null)

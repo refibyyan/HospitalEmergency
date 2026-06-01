@@ -195,8 +195,10 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator BadEndingRoutine()
     {
+        // 1. Layar menutup total (Alpha jadi 1)
         yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
+        // 2. Aktifkan Popup bad ending di belakang layar hitam
         if (badEndingPopupDisplay != null)
         {
             badEndingPopupDisplay.gameObject.SetActive(true);
@@ -204,42 +206,60 @@ public class LevelGameplayManager : MonoBehaviour
             badEndingPopupDisplay.sprite = spritePopupBadRestart;
         }
 
+        // 3. Layar membuka kembali (Alpha jadi 0)
         yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
+        
+        // JAMINAN: Matikan paksa alpha & raycast panel fade agar tidak memblokir visual popup di bawahnya
+        if (fadeCanvasGroup != null)
+        {
+            fadeCanvasGroup.alpha = 0f;
+            fadeCanvasGroup.blocksRaycasts = false;
+        }
+
         isBadEndingActive = true;
     }
 
     void HandleBadEndingInput()
     {
+        // Tekan A atau Panah Kiri -> Pilih RESTART
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             isSelectingRestart = true;
 
-            if (badEndingPopupDisplay != null)
+            if (badEndingPopupDisplay != null && spritePopupBadRestart != null)
             {
                 badEndingPopupDisplay.sprite = spritePopupBadRestart;
             }
         }
+        // Tekan D atau Panah Kanan -> Pilih EXIT
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             isSelectingRestart = false;
 
-            if (badEndingPopupDisplay != null)
+            if (badEndingPopupDisplay != null && spritePopupBadExit != null)
             {
                 badEndingPopupDisplay.sprite = spritePopupBadExit;
             }
         }
 
+        // Tekan Enter atau Space untuk konfirmasi pilihan
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
         {
             isBadEndingActive = false;
 
             if (isSelectingRestart)
             {
+                // Load ulang level permainan
                 SceneManager.LoadScene("Level 3");
             }
             else
             {
+                // Keluar dari aplikasi game
                 Application.Quit();
+#if UNITY_EDITOR
+                // Jika running di Unity Editor, stop mode play secara otomatis
+                UnityEditor.EditorApplication.isPlaying = false;
+#endif
             }
         }
     }

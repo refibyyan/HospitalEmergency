@@ -1,8 +1,9 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class SceneIntroManager : MonoBehaviour
 {
@@ -27,12 +28,10 @@ public class SceneIntroManager : MonoBehaviour
 
     [Header("Fade")]
     public Image fadeImage;
-
     public float fadeDuration = 1f;
 
     [Header("Dialogue")]
     public GameObject dialogueBox;
-
     public TMP_Text dialogueTMP;
 
     [Header("Player Name Text")]
@@ -43,7 +42,6 @@ public class SceneIntroManager : MonoBehaviour
 
     [Header("Lights")]
     public Light2D globalLight;
-
     public Light2D characterLight;
 
     [Header("Player Movement Script")]
@@ -54,308 +52,314 @@ public class SceneIntroManager : MonoBehaviour
 
     [Header("AMBIENT LOOP SFX")]
     public AudioSource ambientAudioSource;
-
     public AudioClip ambientLoopSFX;
-
-    [Range(0f, 1f)]
-    public float ambientVolume = 1f;
-
+    [Range(0f, 1f)] public float ambientVolume = 1f;
     public float ambientDelay = 5f;
 
     private AudioSource dialogueAudioSource;
-
     private Coroutine ambientCoroutine;
+    private bool isIntroRunning = false;
 
     // =========================================
     // AWAKE
     // =========================================
-
     private void Awake()
     {
-        dialogueAudioSource =
-            gameObject.AddComponent<AudioSource>();
+        // Pastikan AudioSource selalu dibuat fresh
+        dialogueAudioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    // =========================================
+    // ON ENABLE - Subscribe scene loaded event
+    // =========================================
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // =========================================
+    // ON SCENE LOADED - Dipanggil setiap kali scene di-load/restart
+    // =========================================
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Re-validasi semua referensi setelah scene reload
+        RevalidateReferences();
+    }
+
+    // =========================================
+    // RE-VALIDASI REFERENSI
+    // Cari ulang object jika referensi null setelah reload
+    // =========================================
+    private void RevalidateReferences()
+    {
+        if (playerMovementScript == null)
+            playerMovementScript = FindObjectOfType<PlayerMovement>();
+
+        if (globalLight == null)
+        {
+            Light2D[] allLights = FindObjectsOfType<Light2D>();
+            foreach (var light in allLights)
+            {
+                if (light.name.ToLower().Contains("global"))
+                {
+                    globalLight = light;
+                    break;
+                }
+            }
+        }
+
+        if (characterLight == null)
+        {
+            Light2D[] allLights = FindObjectsOfType<Light2D>();
+            foreach (var light in allLights)
+            {
+                if (light.name.ToLower().Contains("character") || light.name.ToLower().Contains("player"))
+                {
+                    characterLight = light;
+                    break;
+                }
+            }
+        }
     }
 
     // =========================================
     // START
     // =========================================
-
-    IEnumerator Start()
+    private void Start()
     {
-        // popup hide
+        if (!isIntroRunning)
+        {
+            StartCoroutine(IntroSequence());
+        }
+    }
+
+    // =========================================
+    // INTRO SEQUENCE (Semua logic dipindah ke sini)
+    // =========================================
+    IEnumerator IntroSequence()
+    {
+        isIntroRunning = true;
+
+        // Validasi ulang referensi di awal
+        RevalidateReferences();
+
+        // 1. Sembunyikan popup di awal
         if (popupSprite != null)
-        {
             popupSprite.SetActive(false);
-        }
 
-        // hide dialogue
+        // 2. Sembunyikan dialogue box di awal
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(false);
-        }
 
-        // freeze movement
+        // 3. Matikan pergerakan player selama intro
         if (playerMovementScript != null)
-        {
             playerMovementScript.canMove = false;
-        }
 
-        // global light
+        // 4. Setup awal Lampu
         if (globalLight != null)
-        {
-            globalLight.intensity = 1f;
-        }
+            globalLight.intensity = 0.2f;
 
-        // character light off
+        // 5. Matikan lampu karakter di awal intro
         if (characterLight != null)
-        {
             characterLight.enabled = false;
-        }
 
         // =====================================
         // START AMBIENT LOOP
         // =====================================
+        if (ambientCoroutine != null)
+            StopCoroutine(ambientCoroutine);
 
-        ambientCoroutine =
-            StartCoroutine(AmbientLoopRoutine());
+        ambientCoroutine = StartCoroutine(AmbientLoopRoutine());
 
         // =====================================
         // FORCE BLACK SCREEN
         // =====================================
-
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
-
             fadeImage.transform.SetAsLastSibling();
 
             Color color = fadeImage.color;
-
             color.r = 0f;
             color.g = 0f;
             color.b = 0f;
             color.a = 1f;
-
             fadeImage.color = color;
         }
 
         yield return null;
-
         yield return new WaitForSeconds(0.5f);
 
         // =====================================
         // FADE OUT
         // =====================================
-
         yield return StartCoroutine(FadeOut());
 
         // =====================================
         // PLAY DIALOGUE
         // =====================================
-
-        yield return StartCoroutine(
-            PlayDialogueSequence(introDialogues)
-        );
+        yield return StartCoroutine(PlayDialogueSequence(introDialogues));
 
         // =====================================
-        // PLAYER MOVE ON
+        // POST-INTRO RESET
         // =====================================
 
+        // 1. Nyalakan kembali lampu karakter
+        if (characterLight != null)
+            characterLight.enabled = true;
+
+        // 2. Kembalikan intensitas lampu global
+        if (globalLight != null)
+            globalLight.intensity = 1.0f;
+
+        // 3. Izinkan player bergerak
         if (playerMovementScript != null)
-        {
             playerMovementScript.canMove = true;
-        }
 
-        // =====================================
-        // POPUP SHOW
-        // =====================================
-
+        // 4. Munculkan popup sprite
         if (popupSprite != null)
-        {
             popupSprite.SetActive(true);
-        }
+
+        // 5. Matikan fade image
+        if (fadeImage != null)
+            fadeImage.gameObject.SetActive(false);
+
+        isIntroRunning = false;
     }
 
     // =========================================
     // AMBIENT LOOP
     // =========================================
-
     IEnumerator AmbientLoopRoutine()
     {
         while (true)
         {
-            if (ambientAudioSource != null &&
-                ambientLoopSFX != null)
+            if (ambientAudioSource != null && ambientLoopSFX != null)
             {
-                ambientAudioSource.clip =
-                    ambientLoopSFX;
-
-                ambientAudioSource.volume =
-                    ambientVolume;
-
+                ambientAudioSource.clip = ambientLoopSFX;
+                ambientAudioSource.volume = ambientVolume;
                 ambientAudioSource.loop = true;
-
                 ambientAudioSource.Play();
 
-                // LOOP SELAMA 5 DETIK
                 yield return new WaitForSeconds(5f);
-
                 ambientAudioSource.Stop();
             }
 
-            // JEDA 5 DETIK
-            yield return new WaitForSeconds(
-                ambientDelay
-            );
+            yield return new WaitForSeconds(ambientDelay);
         }
     }
 
     // =========================================
     // STOP AMBIENT
     // =========================================
-
     public void StopAmbientLoop()
     {
         if (ambientCoroutine != null)
         {
             StopCoroutine(ambientCoroutine);
+            ambientCoroutine = null;
         }
 
         if (ambientAudioSource != null)
-        {
             ambientAudioSource.Stop();
-        }
     }
 
     // =========================================
     // PLAY DIALOGUE SEQUENCE
     // =========================================
-
-    public IEnumerator PlayDialogueSequence(
-        DialogueData[] dialogues)
+    public IEnumerator PlayDialogueSequence(DialogueData[] dialogues)
     {
+        if (dialogues == null || dialogues.Length == 0)
+            yield break;
+
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(true);
-        }
 
         foreach (DialogueData dialogue in dialogues)
         {
-            yield return StartCoroutine(
-                TypeWriter(dialogue)
-            );
-
-            yield return new WaitForSeconds(
-                dialogue.textDelay
-            );
+            yield return StartCoroutine(TypeWriter(dialogue));
+            yield return new WaitForSeconds(dialogue.textDelay);
         }
 
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(false);
-        }
     }
 
     // =========================================
     // TYPEWRITER
     // =========================================
-
     public IEnumerator TypeWriter(DialogueData data)
     {
         if (dialogueTMP == null)
             yield break;
 
-        // reset text
         dialogueTMP.text = string.Empty;
 
-        // player name
         if (playerNameTMP != null)
-        {
             playerNameTMP.text = data.playerName;
-        }
 
         dialogueTMP.ForceMeshUpdate();
 
-        // clean text
-        string cleanText =
-            data.dialogueText
+        string cleanText = data.dialogueText
             .Replace("\n", "")
             .Replace("\r", "")
             .Trim();
 
-        // =====================================
-        // PLAY AUDIO
-        // =====================================
-
-        if (data.dialogueSFX != null)
+        if (data.dialogueSFX != null && dialogueAudioSource != null)
         {
             dialogueAudioSource.Stop();
-
-            dialogueAudioSource.clip =
-                data.dialogueSFX;
-
+            dialogueAudioSource.clip = data.dialogueSFX;
             dialogueAudioSource.loop = true;
-
             dialogueAudioSource.Play();
         }
-
-        // =====================================
-        // TYPEWRITER EFFECT
-        // =====================================
 
         foreach (char c in cleanText)
         {
             dialogueTMP.text += c;
-
             dialogueTMP.ForceMeshUpdate();
-
             Canvas.ForceUpdateCanvases();
-
-            yield return new WaitForSeconds(
-                data.textSpeed
-            );
+            yield return new WaitForSeconds(data.textSpeed);
         }
 
-        // =====================================
-        // STOP AUDIO
-        // =====================================
-
-        dialogueAudioSource.Stop();
+        if (dialogueAudioSource != null)
+            dialogueAudioSource.Stop();
     }
 
     // =========================================
     // FADE OUT
     // =========================================
-
     IEnumerator FadeOut()
     {
         if (fadeImage == null)
             yield break;
 
         float time = 0f;
-
         Color color = fadeImage.color;
 
         while (time < fadeDuration)
         {
             time += Time.deltaTime;
-
-            float alpha =
-                Mathf.Lerp(
-                    1f,
-                    0f,
-                    time / fadeDuration
-                );
-
+            float alpha = Mathf.Lerp(1f, 0f, time / fadeDuration);
             color.a = alpha;
-
             fadeImage.color = color;
-
             yield return null;
         }
 
         color.a = 0f;
-
         fadeImage.color = color;
+    }
+
+    // =========================================
+    // ON DESTROY - Bersihkan semua coroutine
+    // =========================================
+    private void OnDestroy()
+    {
+        StopAllCoroutines();
+        isIntroRunning = false;
     }
 }

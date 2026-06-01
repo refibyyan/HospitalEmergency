@@ -65,7 +65,7 @@ public class PotFall : MonoBehaviour
     private bool hasFallen = false;
 
     // Berlaku untuk semua pot
-    private static bool eventAlreadyTriggered = false;
+    private bool eventAlreadyTriggered = false;
 
     void Start()
     {

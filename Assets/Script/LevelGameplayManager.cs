@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,9 +28,10 @@ public class LevelGameplayManager : MonoBehaviour
     public AudioClip sfxSuccessConfirm;
 
     [Header("--- SCENE / EXIT SYSTEM ---")]
-    public string nextSceneName;
+    public string nextSceneName = "Main Menu";
 
     [Header("--- BAD ENDING UI ---")]
+    public GameObject badEndingPanelObject;
     public Image badEndingPopupDisplay;
     public Sprite spritePopupBadRestart;
     public Sprite spritePopupBadExit;
@@ -41,6 +42,8 @@ public class LevelGameplayManager : MonoBehaviour
 
     [Header("--- ENDING DISPLAY ---")]
     public Image endingDisplay;
+    [Tooltip("Masukkan CanvasGroup dari Image Hitam baru khusus untuk transisi ending slide")]
+    public CanvasGroup endingFadeCanvasGroup;
     public List<Sprite> endingSlides = new List<Sprite>();
 
     [Tooltip("DURASI TIAP SLIDE ENDING")]
@@ -48,9 +51,8 @@ public class LevelGameplayManager : MonoBehaviour
 
     // =====================================
     // KONSTANTA ALPHA TARGET FADEIMAGE
-    // Alpha 250 (skala 0-255) = 250f / 255f dalam Unity
     // =====================================
-    private const float FADE_IMAGE_TARGET_ALPHA = 250f / 255f; // ~0.9804f
+    private const float FADE_IMAGE_TARGET_ALPHA = 250f / 255f;
 
     // =====================================
     // INTERNAL
@@ -137,7 +139,6 @@ public class LevelGameplayManager : MonoBehaviour
 
         // =====================================
         // PAKSA ALPHA FADEIMAGE SELAMA SUCCESS POPUP AKTIF
-        // Ini jaminan agar Unity tidak bisa mereset nilai alpha
         // =====================================
         if (waitingSuccessInput && successPopupBackground != null)
         {
@@ -147,14 +148,10 @@ public class LevelGameplayManager : MonoBehaviour
 
     void UpdateTimerDisplay(float timeToDisplay)
     {
-        if (timeToDisplay < 0)
-        {
-            timeToDisplay = 0;
-        }
+        if (timeToDisplay < 0) timeToDisplay = 0;
 
         int minutes = Mathf.FloorToInt(timeToDisplay / 60);
         int seconds = Mathf.FloorToInt(timeToDisplay % 60);
-
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
@@ -165,21 +162,17 @@ public class LevelGameplayManager : MonoBehaviour
         if (player != null)
         {
             Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
+            if (rb != null) rb.linearVelocity = Vector2.zero;
 
             MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
-
             foreach (MonoBehaviour script in scripts)
             {
-                if (script != this)
-                {
-                    script.enabled = false;
-                }
+                if (script != this) script.enabled = false;
             }
+        }
+        else
+        {
+            Debug.LogWarning("[LevelGameplayManager] FreezePlayer: 'lyra_depan' tidak ditemukan!");
         }
     }
 
@@ -191,21 +184,18 @@ public class LevelGameplayManager : MonoBehaviour
         isTimerRunning = false;
         isCutscenePlaying = true;
 
+        Debug.Log("[LevelGameplayManager] TimerGameOver dipanggil!");
+
         if (audioSource != null)
         {
             audioSource.Stop();
             audioSource.loop = false;
         }
 
-        if (popUpCanvasGroup != null)
-        {
-            popUpCanvasGroup.alpha = 0f;
-        }
+        if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
 
         if (audioSource != null && sfxTimerEnd != null)
-        {
             audioSource.PlayOneShot(sfxTimerEnd);
-        }
 
         FreezePlayer();
         StartCoroutine(BadEndingRoutine());
@@ -213,13 +203,27 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator BadEndingRoutine()
     {
+        Debug.Log("[LevelGameplayManager] BadEndingRoutine dimulai...");
+
         yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
+
+        if (badEndingPanelObject != null)
+        {
+            badEndingPanelObject.SetActive(true);
+        }
 
         if (badEndingPopupDisplay != null)
         {
             badEndingPopupDisplay.gameObject.SetActive(true);
+            badEndingPopupDisplay.enabled = true;
+            badEndingPopupDisplay.color = Color.white;
+
             isSelectingRestart = true;
-            badEndingPopupDisplay.sprite = spritePopupBadRestart;
+            SetBadEndingSprite(true);
+        }
+        else
+        {
+            Debug.LogError("[LevelGameplayManager] badEndingPopupDisplay BELUM di-assign di Inspector!");
         }
 
         yield return StartCoroutine(FadeScreen(1f, 0f, 1f));
@@ -233,25 +237,55 @@ public class LevelGameplayManager : MonoBehaviour
         isBadEndingActive = true;
     }
 
-    void HandleBadEndingInput()
+    void SetBadEndingSprite(bool selectRestart)
     {
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            isSelectingRestart = true;
+        if (badEndingPopupDisplay == null) return;
 
-            if (badEndingPopupDisplay != null && spritePopupBadRestart != null)
+        if (selectRestart)
+        {
+            if (spritePopupBadRestart != null)
             {
                 badEndingPopupDisplay.sprite = spritePopupBadRestart;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        else
         {
-            isSelectingRestart = false;
-
-            if (badEndingPopupDisplay != null && spritePopupBadExit != null)
+            if (spritePopupBadExit != null)
             {
                 badEndingPopupDisplay.sprite = spritePopupBadExit;
             }
+        }
+
+        if (badEndingPopupDisplay.canvas != null)
+            Canvas.ForceUpdateCanvases();
+    }
+
+    void HandleBadEndingInput()
+    {
+        bool changed = false;
+
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (!isSelectingRestart)
+            {
+                isSelectingRestart = true;
+                changed = true;
+                Debug.Log("[LevelGameplayManager] Pilihan berubah ke: RESTART");
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (isSelectingRestart)
+            {
+                isSelectingRestart = false;
+                changed = true;
+                Debug.Log("[LevelGameplayManager] Pilihan berubah ke: EXIT");
+            }
+        }
+
+        if (changed)
+        {
+            SetBadEndingSprite(isSelectingRestart);
         }
 
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
@@ -260,14 +294,13 @@ public class LevelGameplayManager : MonoBehaviour
 
             if (isSelectingRestart)
             {
+                Debug.Log("[LevelGameplayManager] Memuat ulang: Level 3");
                 SceneManager.LoadScene("Level 3");
             }
             else
             {
-                Application.Quit();
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-#endif
+                Debug.Log("[LevelGameplayManager] Kembali ke: Main Menu");
+                SceneManager.LoadScene("Main Menu");
             }
         }
     }
@@ -277,11 +310,8 @@ public class LevelGameplayManager : MonoBehaviour
     // =====================================
     public void PlayerReachedExit()
     {
-        if (!isTimerRunning)
-            return;
-
-        if (isCutscenePlaying)
-            return;
+        if (!isTimerRunning) return;
+        if (isCutscenePlaying) return;
 
         isTimerRunning = false;
         isCutscenePlaying = true;
@@ -292,10 +322,7 @@ public class LevelGameplayManager : MonoBehaviour
             audioSource.loop = false;
         }
 
-        if (popUpCanvasGroup != null)
-        {
-            popUpCanvasGroup.alpha = 0f;
-        }
+        if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
 
         FreezePlayer();
         StartCoroutine(GoodEndingRoutine());
@@ -303,17 +330,14 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator GoodEndingRoutine()
     {
-        // 1. Layar menutup total ke hitam (Tirai Utama)
         yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
 
-        // 2. Aktifkan SuccessPopup teks (di depan)
         if (successPopupDisplay != null)
         {
             successPopupDisplay.gameObject.SetActive(true);
             successPopupDisplay.transform.SetAsLastSibling();
         }
 
-        // 3. Paksa aktifkan SuccessFadeBackground Baru dan reset alpha ke 0
         if (successPopupBackground != null)
         {
             successPopupBackground.gameObject.SetActive(true);
@@ -324,56 +348,41 @@ public class LevelGameplayManager : MonoBehaviour
             );
         }
 
-        // 4. Mainkan SFX muncul
         if (audioSource != null && sfxSuccessPopUp != null)
-        {
             audioSource.PlayOneShot(sfxSuccessPopUp);
-        }
 
-        // 5. MODIFIKASI: Kecepatan tirai hitam membuka (1f -> 0f) diset 1 detik,
-        //    Sedangkan background baru (0f -> 250) langsung ngebut selesai dalam 0.2 detik!
         yield return StartCoroutine(FadeScreenAndBackground(
             screenStart: 1f,
-            screenEnd:   0f,
-            bgStart:     0f,
-            bgEnd:       FADE_IMAGE_TARGET_ALPHA,
-            duration:    1f,
-            bgDuration:  0.2f // <-- Parameter baru untuk kecepatan background hitam
+            screenEnd: 0f,
+            bgStart: 0f,
+            bgEnd: FADE_IMAGE_TARGET_ALPHA,
+            duration: 1f,
+            bgDuration: 0.2f
         ));
 
-        // 6. JAMINAN: ikat paksa alpha agar tidak bisa balik ke 0
         if (successPopupBackground != null)
-        {
             successPopupBackground.alpha = FADE_IMAGE_TARGET_ALPHA;
-        }
 
-        // 7. Mulai menunggu input player
         waitingSuccessInput = true;
 
         while (waitingSuccessInput)
         {
             if (Input.GetKeyDown(KeyCode.Return) ||
-                Input.GetKeyDown(KeyCode.Space)  ||
+                Input.GetKeyDown(KeyCode.Space) ||
                 Input.GetMouseButtonDown(0))
             {
                 if (audioSource != null && sfxSuccessConfirm != null)
-                {
                     audioSource.PlayOneShot(sfxSuccessConfirm);
-                }
+
                 waitingSuccessInput = false;
             }
-
             yield return null;
         }
 
-        // 8. Jeda kecil agar SFX confirm sempat terdengar
         yield return new WaitForSeconds(0.2f);
 
-        // 9. Sembunyikan sukses popup setelah input
         if (successPopupDisplay != null)
-        {
             successPopupDisplay.gameObject.SetActive(false);
-        }
 
         if (successPopupBackground != null)
         {
@@ -387,26 +396,54 @@ public class LevelGameplayManager : MonoBehaviour
 
     IEnumerator PlayEndingSlides()
     {
-        if (endingDisplay == null)
-            yield break;
+        if (endingDisplay == null) yield break;
+
+        // Pastikan FadeImage khusus ending aktif dan menutupi layar di awal sequence (Alpha = 1)
+        if (endingFadeCanvasGroup != null)
+        {
+            endingFadeCanvasGroup.gameObject.SetActive(true);
+            endingFadeCanvasGroup.alpha = 1f;
+            endingFadeCanvasGroup.blocksRaycasts = true;
+        }
 
         endingDisplay.gameObject.SetActive(true);
 
         for (int i = 0; i < endingSlides.Count; i++)
         {
-            yield return StartCoroutine(FadeScreen(0f, 1f, 0.7f));
+            // Pasang gambar slide baru di belakang layar hitam khusus ending
             endingDisplay.sprite = endingSlides[i];
-            yield return StartCoroutine(FadeScreen(1f, 0f, 0.7f));
 
+            // FADE IN SLIDE: Layar hitam ending memudar membuka (1f ke 0f)
+            if (endingFadeCanvasGroup != null)
+                yield return StartCoroutine(FadeCustomCanvasGroup(endingFadeCanvasGroup, 1f, 0f, 0.7f));
+
+            // Tampilkan slide sesuai durasi yang ditentukan
             yield return new WaitForSeconds(slideDisplayDuration);
+
+            // FADE OUT SLIDE: Layar hitam ending memudar menutup kembali (0f ke 1f)
+            if (endingFadeCanvasGroup != null)
+                yield return StartCoroutine(FadeCustomCanvasGroup(endingFadeCanvasGroup, 0f, 1f, 0.7f));
+
+            yield return new WaitForSeconds(0.2f);
         }
 
-        yield return StartCoroutine(FadeScreen(0f, 1f, 1f));
+        // Setelah semua slide habis, pindah ke scene Main Menu
+        Debug.Log("[LevelGameplayManager] Selesai memutar slide dengan FadeImage baru. Memuat Main Menu...");
+        SceneManager.LoadScene("Main Menu");
+    }
 
-        if (!string.IsNullOrEmpty(nextSceneName))
+    // Fungsi bantu untuk memudarkan CanvasGroup kustom secara dinamis
+    IEnumerator FadeCustomCanvasGroup(CanvasGroup cg, float startAlpha, float endAlpha, float duration)
+    {
+        float timer = 0f;
+        cg.alpha = startAlpha;
+        while (timer < duration)
         {
-            SceneManager.LoadScene(nextSceneName);
+            timer += Time.deltaTime;
+            cg.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
+            yield return null;
         }
+        cg.alpha = endAlpha;
     }
 
     // =====================================
@@ -414,8 +451,7 @@ public class LevelGameplayManager : MonoBehaviour
     // =====================================
     IEnumerator FadeScreen(float startAlpha, float endAlpha, float duration)
     {
-        if (fadeCanvasGroup == null)
-            yield break;
+        if (fadeCanvasGroup == null) yield break;
 
         float timer = 0f;
         fadeCanvasGroup.alpha = startAlpha;
@@ -431,31 +467,24 @@ public class LevelGameplayManager : MonoBehaviour
         fadeCanvasGroup.alpha = endAlpha;
     }
 
-    // Sistem Interpolasi Ganda dengan kontrol durasi terpisah
     IEnumerator FadeScreenAndBackground(float screenStart, float screenEnd,
-                                         float bgStart,     float bgEnd,
-                                         float duration,    float bgDuration)
+                                         float bgStart, float bgEnd,
+                                         float duration, float bgDuration)
     {
         float timer = 0f;
 
-        if (fadeCanvasGroup != null)        fadeCanvasGroup.alpha        = screenStart;
+        if (fadeCanvasGroup != null) fadeCanvasGroup.alpha = screenStart;
         if (successPopupBackground != null) successPopupBackground.alpha = bgStart;
 
         while (timer < duration || timer < bgDuration)
         {
             timer += Time.deltaTime;
 
-            // Transisi Tirai Utama
             if (fadeCanvasGroup != null && timer <= duration)
-            {
                 fadeCanvasGroup.alpha = Mathf.Lerp(screenStart, screenEnd, timer / duration);
-            }
 
-            // Transisi Kilat Background Sukses (0.2 Detik!)
             if (successPopupBackground != null && timer <= bgDuration)
-            {
                 successPopupBackground.alpha = Mathf.Lerp(bgStart, bgEnd, timer / bgDuration);
-            }
 
             yield return null;
         }
@@ -467,22 +496,19 @@ public class LevelGameplayManager : MonoBehaviour
         }
 
         if (successPopupBackground != null)
-        {
             successPopupBackground.alpha = bgEnd;
-        }
     }
 
     void DeactivateAllEndingUI()
     {
+        if (badEndingPanelObject != null)
+            badEndingPanelObject.SetActive(false);
+
         if (badEndingPopupDisplay != null)
-        {
             badEndingPopupDisplay.gameObject.SetActive(false);
-        }
 
         if (successPopupDisplay != null)
-        {
             successPopupDisplay.gameObject.SetActive(false);
-        }
 
         if (successPopupBackground != null)
         {
@@ -492,23 +518,20 @@ public class LevelGameplayManager : MonoBehaviour
         }
 
         if (endingDisplay != null)
-        {
             endingDisplay.gameObject.SetActive(false);
-        }
+
+        if (endingFadeCanvasGroup != null)
+            endingFadeCanvasGroup.gameObject.SetActive(false);
     }
 
     public void StartTimerAfterPotDialogue()
     {
-        if (timerHasStarted)
-            return;
+        if (timerHasStarted) return;
 
         timerHasStarted = true;
         currentTime = startingTime;
 
-        if (popUpCanvasGroup != null)
-        {
-            popUpCanvasGroup.alpha = 1f;
-        }
+        if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 1f;
 
         isTimerRunning = true;
 

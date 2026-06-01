@@ -6643,38 +6643,38 @@ MonoBehaviour:
   doctorDialogues:
   - playerName: Kiro
     dialogueText: The sound of that monitor is making me nervous
-    textSpeed: 0.07
-    textDelay: 1.2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Kiro
     dialogueText: That patient doesn't look okay... I should check immediately
-    textSpeed: 0.07
-    textDelay: 3
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Kiro
     dialogueText: W-What...? The Lights went out...
-    textSpeed: 0.07
-    textDelay: 1.2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Kiro
     dialogueText: The monitor stopped... even the lights are dead...
-    textSpeed: 0.07
-    textDelay: 1.2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Kiro
     dialogueText: What am I supposed to do in a blackout like this?
-    textSpeed: 0.07
-    textDelay: 2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Doctor
     dialogueText: Hey there!
-    textSpeed: 0.07
-    textDelay: 1.2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Doctor
     dialogueText: 'We need your help! We must save the patient! '
-    textSpeed: 0.07
-    textDelay: 3
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   quickDecisionManager: {fileID: 487723349}
   playerMovementScript: {fileID: 1014859213}
@@ -10760,8 +10760,8 @@ MonoBehaviour:
   introDialogues:
   - playerName: Kiro
     dialogueText: 'Now that the adrenaline is fading... I can barely breathe... '
-    textSpeed: 0.07
-    textDelay: 2
+    textSpeed: 0.04
+    textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   globalLight: {fileID: 1146281645}
   characterLight: {fileID: 1014859223}

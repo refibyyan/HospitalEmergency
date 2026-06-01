@@ -584,7 +584,7 @@ MonoBehaviour:
   displayDuration: 5
   fadeOutDuration: 1
   nextSceneName: Level 3
-  fullText: Moving to Level 2...
+  fullText: Moving to Level 3...
   typingSpeed: 0.05
   typewriterSoundClip: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
 --- !u!1 &1063619854

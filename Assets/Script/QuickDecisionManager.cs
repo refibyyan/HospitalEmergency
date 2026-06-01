@@ -344,18 +344,17 @@ public class QuickDecisionManager : MonoBehaviour
         {
             if (select)
             {
-                PlaySFX(confirmSFX);
+                // Mainkan SFX sebelum scene dihancurkan (menggunakan PlayClipAtPoint agar suara tidak terpotong)
+                if (confirmSFX != null)
+                {
+                    AudioSource.PlayClipAtPoint(confirmSFX, Camera.main.transform.position);
+                }
 
-                if (popupChoice2 != null)
-                    popupChoice2.SetActive(false);
+                // Menghentikan audio timer jika masih berjalan
+                StopMissionTimerSFX(); 
 
-                if (popupDarkOverlay != null)
-                    popupDarkOverlay.SetActive(false);
-
-                popupOpened = false;
-
-                if (playerMovement != null)
-                    playerMovement.canMove = true;
+                // Berpindah ke scene Loading 2 to 3 sesuai permintaan
+                SceneManager.LoadScene("Loading 2 to 3");
 
                 StartCoroutine(InputDelay());
             }

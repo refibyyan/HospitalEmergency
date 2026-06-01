@@ -1271,7 +1271,6 @@ GameObject:
   - component: {fileID: 181142437}
   - component: {fileID: 181142436}
   - component: {fileID: 181142435}
-  - component: {fileID: 181142438}
   m_Layer: 5
   m_Name: TMP Text
   m_TagString: Untagged
@@ -1345,7 +1344,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1367,7 +1366,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -19.163788, y: 0, z: -0.10021973, w: -27.22924}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1400,24 +1399,6 @@ RectTransform:
   m_AnchoredPosition: {x: 11.139404, y: -14}
   m_SizeDelta: {x: 1400.927, y: 118.2002}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &181142438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 181142434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 614811300ed6ecf4ea406b25fd078aec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TypewriterEffect
-  typingSpeed: 0.05
-  startDelay: 0
-  sfxSource: {fileID: 0}
-  typingSound: {fileID: 0}
-  minTimeBetweenSounds: 0.1
-  soundSessions: []
 --- !u!1 &254533113
 GameObject:
   m_ObjectHideFlags: 0
@@ -10759,7 +10740,9 @@ MonoBehaviour:
   playerNameTMP: {fileID: 82749818}
   introDialogues:
   - playerName: Kiro
-    dialogueText: 'Now that the adrenaline is fading... I can barely breathe... '
+    dialogueText: '
+
+      Now that the adrenaline is fading... I can barely breathe... '
     textSpeed: 0.04
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}

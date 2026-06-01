@@ -79,13 +79,13 @@ public class QuickDecisionManager : MonoBehaviour
     public AudioSource missionTimerAudioSource;
     public AudioClip missionTimerSFX;
 
-    bool waitingRestartTrigger   = false;
+    bool waitingRestartTrigger = false;
     bool waitingGeneratorTrigger = false;
 
-    bool uiActive        = false;
-    bool popupOpened     = false;
-    bool eventStarted    = false;
-    bool triggerUsed     = false;
+    bool uiActive = false;
+    bool popupOpened = false;
+    bool eventStarted = false;
+    bool triggerUsed = false;
     bool missionTimerRunning = false;
 
     bool inputLocked = false;
@@ -93,9 +93,9 @@ public class QuickDecisionManager : MonoBehaviour
     // Flag joystick khusus UI — pisah dari karakter
     bool uiJoyInUse = false;
 
-    int currentChoice      = 0;
+    int currentChoice = 0;
     int currentPopupButton = 0;
-    int currentPopupType   = 0;
+    int currentPopupType = 0;
 
     float currentTimer;
     float currentMissionTimer;
@@ -107,14 +107,14 @@ public class QuickDecisionManager : MonoBehaviour
     void Start()
     {
         if (quickDecisionTemplate != null) quickDecisionTemplate.SetActive(false);
-        if (popupChoice1 != null)          popupChoice1.SetActive(false);
-        if (popupChoice2 != null)          popupChoice2.SetActive(false);
-        if (popupChoice3 != null)          popupChoice3.SetActive(false);
-        if (popupDarkOverlay != null)      popupDarkOverlay.SetActive(false);
-        if (popupObjRestart != null)       popupObjRestart.SetActive(false);
-        if (popupObjGenerator != null)     popupObjGenerator.SetActive(false);
-        if (timerTemplate != null)         timerTemplate.SetActive(false);
-        if (triggerDecision != null)       triggerDecision.SetActive(false);
+        if (popupChoice1 != null) popupChoice1.SetActive(false);
+        if (popupChoice2 != null) popupChoice2.SetActive(false);
+        if (popupChoice3 != null) popupChoice3.SetActive(false);
+        if (popupDarkOverlay != null) popupDarkOverlay.SetActive(false);
+        if (popupObjRestart != null) popupObjRestart.SetActive(false);
+        if (popupObjGenerator != null) popupObjGenerator.SetActive(false);
+        if (timerTemplate != null) timerTemplate.SetActive(false);
+        if (triggerDecision != null) triggerDecision.SetActive(false);
 
         UpdateChoiceVisual();
         UpdatePopupVisual();
@@ -160,16 +160,16 @@ public class QuickDecisionManager : MonoBehaviour
     public void StartDecision()
     {
         if (triggerUsed) return;
-        if (uiActive)    return;
+        if (uiActive) return;
 
         triggerUsed = true;
 
         if (triggerDecision != null)
             triggerDecision.SetActive(false);
 
-        uiActive      = true;
+        uiActive = true;
         currentChoice = 0;
-        currentTimer  = 0f;
+        currentTimer = 0f;
 
         if (timerFill != null)
             timerFill.fillAmount = 0f;
@@ -196,8 +196,8 @@ public class QuickDecisionManager : MonoBehaviour
 
     void ReadUIInput(out bool right, out bool left, out bool select)
     {
-        right  = false;
-        left   = false;
+        right = false;
+        left = false;
         select = false;
 
         bool useKeyboard = (esp32Input == null || !esp32Input.isConnected);
@@ -205,8 +205,8 @@ public class QuickDecisionManager : MonoBehaviour
         if (useKeyboard)
         {
             // ---- KEYBOARD ----
-            right  = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
-            left   = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
+            right = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
+            left = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
             select = Input.GetKeyDown(KeyCode.Return);
         }
         else
@@ -218,13 +218,13 @@ public class QuickDecisionManager : MonoBehaviour
             // Joystick ke kanan — one-shot sampai balik ke tengah
             if (!uiJoyInUse && h >= sensitivity)
             {
-                right      = true;
+                right = true;
                 uiJoyInUse = true;
             }
             // Joystick ke kiri — one-shot sampai balik ke tengah
             else if (!uiJoyInUse && h <= -sensitivity)
             {
-                left       = true;
+                left = true;
                 uiJoyInUse = true;
             }
 
@@ -257,7 +257,7 @@ public class QuickDecisionManager : MonoBehaviour
             UpdateChoiceVisual();
             PlaySFX(selectSFX);
             StartCoroutine(InputDelay());
-            return; 
+            return;
         }
 
         if (left)
@@ -312,8 +312,8 @@ public class QuickDecisionManager : MonoBehaviour
             // CHOICE 3 — Popup restart/exit
             else if (currentChoice == 2)
             {
-                popupOpened        = true;
-                currentPopupType   = 3;
+                popupOpened = true;
+                currentPopupType = 3;
                 currentPopupButton = 0;
 
                 if (popupDarkOverlay != null)
@@ -344,16 +344,16 @@ public class QuickDecisionManager : MonoBehaviour
         {
             if (select)
             {
-                // Mainkan SFX sebelum scene dihancurkan (menggunakan PlayClipAtPoint agar suara tidak terpotong)
+                // Mainkan SFX sebelum pindah scene transisi
                 if (confirmSFX != null)
                 {
                     AudioSource.PlayClipAtPoint(confirmSFX, Camera.main.transform.position);
                 }
 
                 // Menghentikan audio timer jika masih berjalan
-                StopMissionTimerSFX(); 
+                StopMissionTimerSFX();
 
-                // Berpindah ke scene Loading 2 to 3 sesuai permintaan
+                // Menuju ke scene transisi pembatas antar level
                 SceneManager.LoadScene("Loading 2 to 3");
 
                 StartCoroutine(InputDelay());
@@ -408,12 +408,10 @@ public class QuickDecisionManager : MonoBehaviour
 
     void UpdateChoiceVisual()
     {
-        // 1. Kembalikan semua pilihan ke sprite OFF terlebih dahulu
         if (choice1 != null) choice1.sprite = choice1OFF;
         if (choice2 != null) choice2.sprite = choice2OFF;
         if (choice3 != null) choice3.sprite = choice3OFF;
 
-        // 2. Pasangkan sprite ON pada index pilihan yang sedang aktif (0, 1, atau 2)
         switch (currentChoice)
         {
             case 0:
@@ -430,11 +428,11 @@ public class QuickDecisionManager : MonoBehaviour
 
     void UpdatePopupVisual()
     {
-        if (restartButton1 != null)  restartButton1.sprite  = restartOFF;
-        if (exitButton1 != null)     exitButton1.sprite     = exitOFF;
+        if (restartButton1 != null) restartButton1.sprite = restartOFF;
+        if (exitButton1 != null) exitButton1.sprite = exitOFF;
         if (continueButton2 != null) continueButton2.sprite = continueOFF;
-        if (restartButton3 != null)  restartButton3.sprite  = restartOFF;
-        if (exitButton3 != null)     exitButton3.sprite     = exitOFF;
+        if (restartButton3 != null) restartButton3.sprite = restartOFF;
+        if (exitButton3 != null) exitButton3.sprite = exitOFF;
 
         if (currentPopupType == 1)
         {
@@ -467,7 +465,7 @@ public class QuickDecisionManager : MonoBehaviour
     }
 
     // =========================================================
-    // TIMER & EVENTS (Tetap Aman Sesuai Logika Awal)
+    // TIMER & EVENTS
     // =========================================================
 
     void HandleTimer()
@@ -485,8 +483,8 @@ public class QuickDecisionManager : MonoBehaviour
 
     void StartMissionTimer()
     {
-        missionTimerRunning  = true;
-        currentMissionTimer  = missionTimerDuration;
+        missionTimerRunning = true;
+        currentMissionTimer = missionTimerDuration;
 
         if (timerTemplate != null)
             timerTemplate.SetActive(true);
@@ -509,10 +507,10 @@ public class QuickDecisionManager : MonoBehaviour
 
         if (currentMissionTimer <= 0f)
         {
-            currentMissionTimer  = 0f;
-            missionTimerRunning  = false;
+            currentMissionTimer = 0f;
+            missionTimerRunning = false;
             StopMissionTimerSFX();
-            SceneManager.LoadScene("level 2");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
@@ -540,8 +538,8 @@ public class QuickDecisionManager : MonoBehaviour
 
     public void TriggerRestartEvent()
     {
-        if (eventStarted)            return;
-        if (!waitingRestartTrigger)  return;
+        if (eventStarted) return;
+        if (!waitingRestartTrigger) return;
 
         StopMissionTimer();
         StartCoroutine(RestartLightEvent());
@@ -549,8 +547,8 @@ public class QuickDecisionManager : MonoBehaviour
 
     public void TriggerGeneratorEvent()
     {
-        if (eventStarted)              return;
-        if (!waitingGeneratorTrigger)  return;
+        if (eventStarted) return;
+        if (!waitingGeneratorTrigger) return;
 
         StopMissionTimer();
         StartCoroutine(GeneratorEvent());
@@ -558,7 +556,7 @@ public class QuickDecisionManager : MonoBehaviour
 
     IEnumerator RestartLightEvent()
     {
-        eventStarted          = true;
+        eventStarted = true;
         waitingRestartTrigger = false;
 
         if (playerMovement != null)
@@ -580,20 +578,20 @@ public class QuickDecisionManager : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        popupOpened        = true;
-        currentPopupType   = 1;
+        popupOpened = true;
+        currentPopupType = 1;
         currentPopupButton = 0;
 
         if (popupDarkOverlay != null) popupDarkOverlay.SetActive(true);
-        if (popupChoice1 != null)     popupChoice1.SetActive(true);
+        if (popupChoice1 != null) popupChoice1.SetActive(true);
 
         UpdatePopupVisual();
     }
 
     IEnumerator GeneratorEvent()
     {
-        eventStarted             = true;
-        waitingGeneratorTrigger  = false;
+        eventStarted = true;
+        waitingGeneratorTrigger = false;
 
         if (playerMovement != null)
             playerMovement.canMove = false;
@@ -606,11 +604,11 @@ public class QuickDecisionManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        popupOpened      = true;
+        popupOpened = true;
         currentPopupType = 2;
 
         if (popupDarkOverlay != null) popupDarkOverlay.SetActive(true);
-        if (popupChoice2 != null)     popupChoice2.SetActive(true);
+        if (popupChoice2 != null) popupChoice2.SetActive(true);
 
         UpdatePopupVisual();
     }
@@ -618,16 +616,16 @@ public class QuickDecisionManager : MonoBehaviour
     void HideAllDecisionUI()
     {
         if (quickDecisionTemplate != null) quickDecisionTemplate.SetActive(false);
-        if (popupChoice1 != null)          popupChoice1.SetActive(false);
-        if (popupChoice2 != null)          popupChoice2.SetActive(false);
-        if (popupChoice3 != null)          popupChoice3.SetActive(false);
-        if (popupDarkOverlay != null)      popupDarkOverlay.SetActive(false);
+        if (popupChoice1 != null) popupChoice1.SetActive(false);
+        if (popupChoice2 != null) popupChoice2.SetActive(false);
+        if (popupChoice3 != null) popupChoice3.SetActive(false);
+        if (popupDarkOverlay != null) popupDarkOverlay.SetActive(false);
 
         if (audioSource != null)
             audioSource.Stop();
 
-        uiActive     = false;
-        popupOpened  = false;
+        uiActive = false;
+        popupOpened = false;
     }
 
     void PlaySFX(AudioClip clip)

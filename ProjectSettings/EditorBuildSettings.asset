@@ -26,5 +26,17 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Loading 2 to 3.unity
     guid: 4a49f29664f7d1e43b93192b04a0cc6e
+  - enabled: 1
+    path: Assets/Scenes/Level 3 Kiro.unity
+    guid: e6acec5835c7fa44abe0a428ae12375b
+  - enabled: 1
+    path: Assets/Scenes/Level 1.unity
+    guid: 7abee27ee5608584ebcae52bdd30fdc2
+  - enabled: 1
+    path: Assets/Scenes/level 1 kiro.unity
+    guid: 0d49dbaeeb37ed04291bb90576a6f5fa
+  - enabled: 1
+    path: Assets/Scenes/Level 2 Lyra.unity
+    guid: 334499b6c005efe46a5273b2aba0623a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}

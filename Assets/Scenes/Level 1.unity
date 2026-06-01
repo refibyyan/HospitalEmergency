@@ -856,10 +856,10 @@ MonoBehaviour:
   buttonExitUI: {fileID: 0}
   restartButton: {fileID: 0}
   exitButton: {fileID: 0}
-  restartIjo: {fileID: 0}
-  restartPolos: {fileID: 0}
-  exitIjo: {fileID: 0}
-  exitPolos: {fileID: 0}
+  restartIjo: {fileID: 21300000, guid: decaa981c3a27174484cf2682825e542, type: 3}
+  restartPolos: {fileID: 21300000, guid: ea85673719c36244a8b7abb147a29a08, type: 3}
+  exitIjo: {fileID: 21300000, guid: 0224ba014b034b044abd4e45e0699a8b, type: 3}
+  exitPolos: {fileID: 21300000, guid: a8149bf91c3584e4bbda98875f35be80, type: 3}
   restartText: {fileID: 0}
   exitText: {fileID: 0}
   timerSource: {fileID: 75671538}

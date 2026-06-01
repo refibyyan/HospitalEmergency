@@ -155,24 +155,50 @@ public class LevelGameplayManager : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
+    // Fungsi bawaan (Fallback) jika game over dipicu oleh waktu habis (mencari lyra_depan)
     void FreezePlayer()
     {
         GameObject player = GameObject.Find("lyra_depan");
 
         if (player != null)
         {
-            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.linearVelocity = Vector2.zero;
+            FreezePlayerDynamic(player);
+        }
+        else
+        {
+            Debug.LogWarning("[LevelGameplayManager] FreezePlayer: 'lyra_depan' tidak ditemukan otomatis!");
+        }
+    }
 
+    // Fungsi baru untuk membekukan player secara dinamis & MENGEHENTIKAN SFX LANGKAH KAKI
+    void FreezePlayerDynamic(GameObject player)
+    {
+        if (player != null)
+        {
+            // 1. Hentikan kecepatan fisika Rigidbody2D
+            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+
+            // 2. MATIKAN SFX DERAP LANGKAH KAKI PADA PLAYER (Mencari AudioSource di objek ini & anak objeknya)
+            AudioSource[] playerAudioSources = player.GetComponentsInChildren<AudioSource>();
+            foreach (AudioSource pAudio in playerAudioSources)
+            {
+                if (pAudio != null && pAudio.isPlaying)
+                {
+                    pAudio.Stop();
+                }
+            }
+
+            // 3. Matikan semua script pergerakan/input di objek player tersebut
             MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
             foreach (MonoBehaviour script in scripts)
             {
                 if (script != this) script.enabled = false;
             }
-        }
-        else
-        {
-            Debug.LogWarning("[LevelGameplayManager] FreezePlayer: 'lyra_depan' tidak ditemukan!");
+            Debug.Log("[LevelGameplayManager] " + player.name + " & SFX Langkah Kakinya berhasil dihentikan!");
         }
     }
 
@@ -294,8 +320,26 @@ public class LevelGameplayManager : MonoBehaviour
 
             if (isSelectingRestart)
             {
-                Debug.Log("[LevelGameplayManager] Memuat ulang: Level 3");
-                SceneManager.LoadScene("Level 3");
+                // =====================================
+                // AUTOMATIC SCENE RELOAD
+                // =====================================
+                string activeSceneName = SceneManager.GetActiveScene().name;
+
+                if (activeSceneName == "Level 3")
+                {
+                    Debug.Log("[LevelGameplayManager] Memuat ulang scene utama: Level 3");
+                    SceneManager.LoadScene("Level 3");
+                }
+                else if (activeSceneName == "Level 3 Kiro")
+                {
+                    Debug.Log("[LevelGameplayManager] Memuat ulang scene karakter: Level 3 Kiro");
+                    SceneManager.LoadScene("Level 3 Kiro");
+                }
+                else
+                {
+                    Debug.Log("[LevelGameplayManager] Memuat ulang scene aktif saat ini: " + activeSceneName);
+                    SceneManager.LoadScene(activeSceneName);
+                }
             }
             else
             {
@@ -306,9 +350,9 @@ public class LevelGameplayManager : MonoBehaviour
     }
 
     // =====================================
-    // GOOD ENDING
+    // GOOD ENDING (MODIFIED FOR DYNAMIC FREEZE)
     // =====================================
-    public void PlayerReachedExit()
+    public void PlayerReachedExit(GameObject playerObject)
     {
         if (!isTimerRunning) return;
         if (isCutscenePlaying) return;
@@ -324,7 +368,9 @@ public class LevelGameplayManager : MonoBehaviour
 
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
 
-        FreezePlayer();
+        // Membekukan pergerakan objek player sekaligus mematikan langkah kakinya
+        FreezePlayerDynamic(playerObject);
+
         StartCoroutine(GoodEndingRoutine());
     }
 
@@ -398,7 +444,6 @@ public class LevelGameplayManager : MonoBehaviour
     {
         if (endingDisplay == null) yield break;
 
-        // Pastikan FadeImage khusus ending aktif dan menutupi layar di awal sequence (Alpha = 1)
         if (endingFadeCanvasGroup != null)
         {
             endingFadeCanvasGroup.gameObject.SetActive(true);
@@ -410,29 +455,23 @@ public class LevelGameplayManager : MonoBehaviour
 
         for (int i = 0; i < endingSlides.Count; i++)
         {
-            // Pasang gambar slide baru di belakang layar hitam khusus ending
             endingDisplay.sprite = endingSlides[i];
 
-            // FADE IN SLIDE: Layar hitam ending memudar membuka (1f ke 0f)
             if (endingFadeCanvasGroup != null)
                 yield return StartCoroutine(FadeCustomCanvasGroup(endingFadeCanvasGroup, 1f, 0f, 0.7f));
 
-            // Tampilkan slide sesuai durasi yang ditentukan
             yield return new WaitForSeconds(slideDisplayDuration);
 
-            // FADE OUT SLIDE: Layar hitam ending memudar menutup kembali (0f ke 1f)
             if (endingFadeCanvasGroup != null)
                 yield return StartCoroutine(FadeCustomCanvasGroup(endingFadeCanvasGroup, 0f, 1f, 0.7f));
 
             yield return new WaitForSeconds(0.2f);
         }
 
-        // Setelah semua slide habis, pindah ke scene Main Menu
         Debug.Log("[LevelGameplayManager] Selesai memutar slide dengan FadeImage baru. Memuat Main Menu...");
         SceneManager.LoadScene("Main Menu");
     }
 
-    // Fungsi bantu untuk memudarkan CanvasGroup kustom secara dinamis
     IEnumerator FadeCustomCanvasGroup(CanvasGroup cg, float startAlpha, float endAlpha, float duration)
     {
         float timer = 0f;

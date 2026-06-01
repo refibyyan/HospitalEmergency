@@ -9,22 +9,38 @@ public class SceneController : MonoBehaviour
     [Header("UI References")]
     public CanvasGroup fadeOverlay;
     public TextMeshProUGUI introText;
-    
+
     [Header("Duration Settings")]
     public float fadeInDuration = 1.0f;
     public float displayDuration = 5.0f;
     public float fadeOutDuration = 1.0f;
-    public string nextSceneName = "Level 2";
+
+    [Tooltip("Akan otomatis disesuaikan berdasarkan pilihan karakter (Lyra -> Level 2 Lyra, Kiro -> Level 2)")]
+    public string nextSceneName = "Level 2 Lyra";
 
     [Header("Typewriter Settings")]
     public string fullText = "Moving to Level 2...";
     public float typingSpeed = 0.05f;
-    
+
     private AudioSource audioSource;
     public AudioClip typewriterSoundClip;
 
     private void Start()
     {
+        // PENGECEKAN KONDISI YANG SUDAH DIPERBAIKI:
+        // Jika sebelumnya memilih Lyra -> Maka lanjut ke "Level 2 Lyra"
+        if (Select.selectedCharacter == "Lyra")
+        {
+            nextSceneName = "Level 2 Lyra";
+            Debug.Log("[SceneController] Karakter Lyra terdeteksi. Target Scene berikutnya: " + nextSceneName);
+        }
+        // Jika sebelumnya memilih Kiro -> Maka lanjut ke "Level 2"
+        else if (Select.selectedCharacter == "Kiro")
+        {
+            nextSceneName = "Level 2";
+            Debug.Log("[SceneController] Karakter Kiro terdeteksi. Target Scene berikutnya: " + nextSceneName);
+        }
+
         // Setup AudioSource secara otomatis lewat code
         audioSource = gameObject.GetComponent<AudioSource>();
         if (audioSource == null)
@@ -32,7 +48,7 @@ public class SceneController : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         audioSource.playOnAwake = false;
-        audioSource.loop = false; // Mengunci agar Audio Source tidak ngeloop sendiri
+        audioSource.loop = false;
         audioSource.clip = typewriterSoundClip;
 
         // Pastikan overlay menutupi layar di awal
@@ -46,7 +62,7 @@ public class SceneController : MonoBehaviour
         // 1. Fade In (Layar Gelap ke Transparan)
         yield return StartCoroutine(Fade(1, 0, fadeInDuration));
 
-        // 2. Typewriter Effect & SFX (Suara hanya menyala di sini)
+        // 2. Typewriter Effect & SFX
         yield return StartCoroutine(TypeText());
 
         // 3. Menunggu sisa durasi scene (Total 5 detik dari awal)
@@ -55,7 +71,8 @@ public class SceneController : MonoBehaviour
         // 4. Fade Out (Layar Transparan ke Gelap)
         yield return StartCoroutine(Fade(0, 1, fadeOutDuration));
 
-        // 5. Pindah ke Level 2
+        // 5. Pindah ke Level berikutnya sesuai dengan logika di atas
+        Debug.Log("Memuat Scene: " + nextSceneName);
         SceneManager.LoadScene(nextSceneName);
     }
 
@@ -76,21 +93,16 @@ public class SceneController : MonoBehaviour
         foreach (char c in fullText)
         {
             introText.text += c;
-            
+
             if (audioSource != null && typewriterSoundClip != null)
             {
-                // JALUR AMAN: Matikan suara huruf sebelumnya secara paksa
-                audioSource.Stop(); 
-                
-                // Mainkan suara pendek untuk huruf yang sekarang
+                audioSource.Stop();
                 audioSource.Play();
             }
-            
-            // Tunggu selama durasi kecepatan ketik sebelum ke huruf berikutnya
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
-        // KUNCI UTAMA: Setelah semua huruf selesai diketik, matikan audio total!
         if (audioSource != null)
         {
             audioSource.Stop();

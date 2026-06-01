@@ -9,10 +9,10 @@ public class MekanikDecision : MonoBehaviour
     public Image cardKiriUI;
     public Image cardKananUI;
 
-[Header("SFX")]
-public AudioSource audioSource;
-public AudioClip chooseClick;
-public AudioClip berhasilLevel;
+    [Header("SFX")]
+    public AudioSource audioSource;
+    public AudioClip chooseClick;
+    public AudioClip berhasilLevel;
 
     [Header("Sprite Card Kiri")]
     public Sprite gambarKiriIjo;
@@ -39,8 +39,8 @@ public AudioClip berhasilLevel;
     [Header("Button Game Over")]
     public Image buttonRestartUI;
     public Image buttonExitUI;
-    public Button restartButton;    // ← TAMBAHAN
-    public Button exitButton;       // ← TAMBAHAN
+    public Button restartButton;
+    public Button exitButton;
     public Sprite restartIjo;
     public Sprite restartPolos;
     public Sprite exitIjo;
@@ -56,16 +56,16 @@ public AudioClip berhasilLevel;
     private bool pilihRestart = true;
 
     [Header("Timer Audio")]
-public AudioSource timerSource;
-public AudioClip timerSFX;
+    public AudioSource timerSource;
+    public AudioClip timerSFX;
 
-[Header("Game Over Audio")]
-public AudioSource gameOverSource;
-public AudioClip hentiJantungSFX;
+    [Header("Game Over Audio")]
+    public AudioSource gameOverSource;
+    public AudioClip hentiJantungSFX;
 
-[Header("Monitor Jantung")]
-public AudioSource monitorSource;
-public AudioClip monitorJantung;
+    [Header("Monitor Jantung")]
+    public AudioSource monitorSource;
+    public AudioClip monitorJantung;
 
     void Start()
     {
@@ -89,7 +89,6 @@ public AudioClip monitorJantung;
         if (proceedButton != null)
             proceedButton.onClick.AddListener(LanjutLevel2);
 
-        // ← TAMBAHAN
         if (restartButton != null)
             restartButton.onClick.AddListener(() =>
             {
@@ -105,13 +104,13 @@ public AudioClip monitorJantung;
                 UnityEditor.EditorApplication.isPlaying = false;
 #endif
             });
-        
+
         if (timerSource != null && timerSFX != null)
-{
-    timerSource.clip = timerSFX;
-    timerSource.loop = true;
-    timerSource.Play();
-}
+        {
+            timerSource.clip = timerSFX;
+            timerSource.loop = true;
+            timerSource.Play();
+        }
 
         UpdatePilihanCard();
         UpdateGameOverButton();
@@ -154,33 +153,33 @@ public AudioClip monitorJantung;
     }
 
     void InputPilihan()
-{
-    if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
     {
-        pilihKiri = true;
-        UpdatePilihanCard();
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            pilihKiri = true;
+            UpdatePilihanCard();
 
-        if (audioSource != null && chooseClick != null)
-            audioSource.PlayOneShot(chooseClick);
+            if (audioSource != null && chooseClick != null)
+                audioSource.PlayOneShot(chooseClick);
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            pilihKiri = false;
+            UpdatePilihanCard();
+
+            if (audioSource != null && chooseClick != null)
+                audioSource.PlayOneShot(chooseClick);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            if (pilihKiri)
+                Menang();
+            else
+                TriggerGameOver();
+        }
     }
-
-    if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-    {
-        pilihKiri = false;
-        UpdatePilihanCard();
-
-        if (audioSource != null && chooseClick != null)
-            audioSource.PlayOneShot(chooseClick);
-    }
-
-    if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
-    {
-        if (pilihKiri)
-            Menang();
-        else
-            TriggerGameOver();
-    }
-}
 
     void UpdatePilihanCard()
     {
@@ -197,21 +196,21 @@ public AudioClip monitorJantung;
     }
 
     public void Menang()
-{
-    if (gameSelesai) return;
+    {
+        if (gameSelesai) return;
 
-    gameSelesai = true;
+        gameSelesai = true;
 
-    if (audioSource != null && berhasilLevel != null)
-        audioSource.PlayOneShot(berhasilLevel);
+        if (audioSource != null && berhasilLevel != null)
+            audioSource.PlayOneShot(berhasilLevel);
 
-    Debug.Log("MENANG!");
+        Debug.Log("MENANG!");
 
-    if (winPanel != null)
-        winPanel.SetActive(true);
+        if (winPanel != null)
+            winPanel.SetActive(true);
 
-    Time.timeScale = 0f;
-}
+        Time.timeScale = 0f;
+    }
 
     void LanjutLevel2()
     {
@@ -220,49 +219,47 @@ public AudioClip monitorJantung;
 
         Time.timeScale = 1f;
 
-        // Memanggil scene sesuai nama di folder Assets kamu
+        // Memanggil scene transisi Loading 1 to 2
         SceneManager.LoadScene("Loading 1 to 2");
     }
 
     void TriggerGameOver()
-{
-    if (isGameOverActive) return;
-
-    isGameOverActive = true;
-
-    // Stop suara timer
-    if (timerSource != null)
-        timerSource.Stop();
-
-    // Stop monitor jantung
-    if (monitorSource != null)
-        monitorSource.Stop();
-
-    // Mainkan suara henti jantung
-    if (gameOverSource != null && hentiJantungSFX != null)
     {
-        gameOverSource.PlayOneShot(hentiJantungSFX);
+        if (isGameOverActive) return;
+
+        isGameOverActive = true;
+
+        if (timerSource != null)
+            timerSource.Stop();
+
+        if (monitorSource != null)
+            monitorSource.Stop();
+
+        if (gameOverSource != null && hentiJantungSFX != null)
+        {
+            gameOverSource.PlayOneShot(hentiJantungSFX);
+        }
+
+        Debug.Log("GAME OVER!");
+
+        Time.timeScale = 0f;
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        UpdateGameOverButton();
     }
 
-    Debug.Log("GAME OVER!");
-
-    Time.timeScale = 0f;
-
-    if (gameOverPanel != null)
-        gameOverPanel.SetActive(true);
-
-    UpdateGameOverButton();
-}
-
-public void MulaiMonitorJantung()
-{
-    if (monitorSource != null && monitorJantung != null)
+    public void MulaiMonitorJantung()
     {
-        monitorSource.clip = monitorJantung;
-        monitorSource.loop = true;
-        monitorSource.Play();
+        if (monitorSource != null && monitorJantung != null)
+        {
+            monitorSource.clip = monitorJantung;
+            monitorSource.loop = true;
+            monitorSource.Play();
+        }
     }
-}
+
     void UpdateGameOverButton()
     {
         if (buttonRestartUI == null || buttonExitUI == null) return;
@@ -284,35 +281,36 @@ public void MulaiMonitorJantung()
             if (exitText != null) exitText.color = new Color32(125, 185, 171, 255);
         }
     }
-void NavigasiGameOver()
-{
-    if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-    {
-        pilihRestart = true;
-        UpdateGameOverButton();
-    }
 
-    if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+    void NavigasiGameOver()
     {
-        pilihRestart = false;
-        UpdateGameOverButton();
-    }
-
-    if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
-    {
-        if (pilihRestart)
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            pilihRestart = true;
+            UpdateGameOverButton();
         }
-        else
+
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
-            Application.Quit();
+            pilihRestart = false;
+            UpdateGameOverButton();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            if (pilihRestart)
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+            else
+            {
+                Application.Quit();
 
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
+                UnityEditor.EditorApplication.isPlaying = false;
 #endif
+            }
         }
     }
-}
 }

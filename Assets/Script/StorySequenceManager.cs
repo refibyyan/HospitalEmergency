@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Tambahkan ini untuk pindah scene
+using UnityEngine.SceneManagement;
 
 public class StorySequenceManager : MonoBehaviour
 {
@@ -12,7 +12,6 @@ public class StorySequenceManager : MonoBehaviour
     public CanvasGroup fadeOverlay;
 
     [Header("Story Assets")]
-    // ... (Part 1 & 2 tetap sama)
     public Sprite bgSprite1;
     [TextArea(3, 5)] public string textContent1;
     public AudioClip audioPart1;
@@ -27,9 +26,10 @@ public class StorySequenceManager : MonoBehaviour
     public float fadeDuration = 1.0f;
     public float postAudioDelay = 1.0f;
     public float typingSpeed = 0.05f;
-    
+
     [Header("Exit Settings")]
-    public string nextSceneName = "MainMenu"; // Nama scene tujuan
+    [Tooltip("Akan otomatis berubah sesuai karakter yang dipilih di scene Select")]
+    public string nextSceneName = "Level 1";
     public float part3TotalDuration = 7.0f;   // Durasi paksa Part 3
 
     private AudioSource audioSource;
@@ -37,6 +37,18 @@ public class StorySequenceManager : MonoBehaviour
 
     void Start()
     {
+        // MENGECEK PILIHAN KARAKTER DARI SCENE SEBELUMNYA
+        if (Select.selectedCharacter == "Kiro")
+        {
+            nextSceneName = "Level 1 Kiro";
+            Debug.Log("[StorySequenceManager] Karakter terdeteksi: KIRO. Target Scene: " + nextSceneName);
+        }
+        else
+        {
+            nextSceneName = "Level 1";
+            Debug.Log("[StorySequenceManager] Karakter terdeteksi: LYRA. Target Scene: " + nextSceneName);
+        }
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -50,14 +62,14 @@ public class StorySequenceManager : MonoBehaviour
     IEnumerator RunStorySequence()
     {
         // ================================================================
-        // SEKUENS 1 & 2 (Tetap sama seperti kode sebelumnya)
+        // SEKUENS 1
         // ================================================================
-        // ... (Kode Sekuens 1)
         backgroundImage.sprite = bgSprite1;
         backgroundImage.gameObject.SetActive(true);
         storyText.text = "";
         yield return StartCoroutine(Fade(1, 0));
-        if (audioPart1 != null) {
+        if (audioPart1 != null)
+        {
             audioSource.clip = audioPart1;
             audioSource.Play();
             if (typewriter != null) typewriter.SetupAndPlay(textContent1, typingSpeed);
@@ -66,10 +78,13 @@ public class StorySequenceManager : MonoBehaviour
         }
         yield return StartCoroutine(Fade(0, 1));
 
-        // ... (Kode Sekuens 2)
+        // ================================================================
+        // SEKUENS 2
+        // ================================================================
         backgroundImage.gameObject.SetActive(false);
         storyText.gameObject.SetActive(false);
-        if (audioPart2 != null) {
+        if (audioPart2 != null)
+        {
             audioSource.clip = audioPart2;
             audioSource.Play();
             yield return new WaitForSeconds(audioPart2.length);
@@ -81,7 +96,7 @@ public class StorySequenceManager : MonoBehaviour
         backgroundImage.sprite = bgSprite3;
         backgroundImage.gameObject.SetActive(true);
         storyText.gameObject.SetActive(true);
-        storyText.text = ""; 
+        storyText.text = "";
 
         yield return StartCoroutine(Fade(1, 0));
 
@@ -97,8 +112,9 @@ public class StorySequenceManager : MonoBehaviour
 
         // FADE OUT TERAKHIR SEBELUM PINDAH
         yield return StartCoroutine(Fade(0, 1));
-        
-        Debug.Log("Pindah ke Scene: " + nextSceneName);
+
+        // Memuat scene dinamis berdasarkan pilihan karakter tadi
+        Debug.Log("Pindah ke Scene Berdasarkan Karakter: " + nextSceneName);
         SceneManager.LoadScene(nextSceneName);
     }
 

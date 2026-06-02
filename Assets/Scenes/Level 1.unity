@@ -539,6 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e118997ee9393304faaa41e7afa8fec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneTyping
+  esp32Input: {fileID: 476382626}
   cutscenePanel: {fileID: 1081336823}
   dialogueText: {fileID: 827751956}
   dialogLines:
@@ -837,6 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff86450024a453141ac1d75d3579cc5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MekanikDecision
+  esp32Input: {fileID: 476382626}
   cardKiriUI: {fileID: 1914307666}
   cardKananUI: {fileID: 1708617941}
   audioSource: {fileID: 75671538}
@@ -852,10 +854,10 @@ MonoBehaviour:
   winPanel: {fileID: 790272435}
   gameOverPanel: {fileID: 74958326}
   proceedButton: {fileID: 859751782}
-  buttonRestartUI: {fileID: 0}
-  buttonExitUI: {fileID: 0}
-  restartButton: {fileID: 0}
-  exitButton: {fileID: 0}
+  buttonRestartUI: {fileID: 1007620415}
+  buttonExitUI: {fileID: 2118696983}
+  restartButton: {fileID: 1007620414}
+  exitButton: {fileID: 2118696982}
   restartIjo: {fileID: 21300000, guid: decaa981c3a27174484cf2682825e542, type: 3}
   restartPolos: {fileID: 21300000, guid: ea85673719c36244a8b7abb147a29a08, type: 3}
   exitIjo: {fileID: 21300000, guid: 0224ba014b034b044abd4e45e0699a8b, type: 3}
@@ -2213,7 +2215,6 @@ GameObject:
   - component: {fileID: 298423714}
   - component: {fileID: 298423717}
   - component: {fileID: 298423716}
-  - component: {fileID: 298423715}
   m_Layer: 5
   m_Name: cardKiriBorder
   m_TagString: Untagged
@@ -2241,62 +2242,6 @@ RectTransform:
   m_AnchoredPosition: {x: -333, y: -94}
   m_SizeDelta: {x: 491, y: 472}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &298423715
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 298423713}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 298423716}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2135523062}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &298423716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3037,6 +2982,59 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.7287278, y: 1.7786591}
   m_EdgeRadius: 0
+--- !u!1 &476382625
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 476382627}
+  - component: {fileID: 476382626}
+  m_Layer: 0
+  m_Name: ESP32Input
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &476382626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476382625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
+  portName: COM3
+  baudRate: 115200
+  joystickSensitivity: 0.5
+  joystickMoveMultiplier: 4
+  horizontal: 0
+  vertical: 0
+  selectPressed: 0
+  selectHeld: 0
+  isConnected: 1
+--- !u!4 &476382627
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476382625}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.73242, y: 3.74181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &482940272
 GameObject:
   m_ObjectHideFlags: 0
@@ -3812,6 +3810,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: espInput
+      value: 
+      objectReference: {fileID: 476382626}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
@@ -5720,81 +5722,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 6.992546, y: 1.5424716}
   m_EdgeRadius: 0
---- !u!1 &1012009299
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1012009300}
-  - component: {fileID: 1012009302}
-  - component: {fileID: 1012009301}
-  m_Layer: 5
-  m_Name: background
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1012009300
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1081336824}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1012009301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: -7040597880176113311, guid: dc2a6b91daf8c62459630de4608e9435, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1012009302
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_CullTransparentMesh: 1
 --- !u!1 &1016010566
 GameObject:
   m_ObjectHideFlags: 0
@@ -6328,7 +6255,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1012009300}
   - {fileID: 2030221601}
   m_Father: {fileID: 254533117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6504,6 +6430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56baf441673dff143bd1b6f489570360, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
+  esp32Input: {fileID: 476382626}
   dialogBox: {fileID: 1364066614}
   textMeshPro: {fileID: 911948278}
   typingSpeed: 0.07
@@ -8986,7 +8913,6 @@ GameObject:
   - component: {fileID: 1555837355}
   - component: {fileID: 1555837358}
   - component: {fileID: 1555837357}
-  - component: {fileID: 1555837356}
   m_Layer: 5
   m_Name: cardKananBorder
   m_TagString: Untagged
@@ -9014,50 +8940,6 @@ RectTransform:
   m_AnchoredPosition: {x: 347, y: -96}
   m_SizeDelta: {x: 491, y: 472}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1555837356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1555837354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1555837357}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1555837357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9572,6 +9454,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!50 &1632986402 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 1379921149426068556, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+  m_PrefabInstance: {fileID: 662197395}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1654110472
 GameObject:
   m_ObjectHideFlags: 0
@@ -9895,7 +9782,6 @@ GameObject:
   - component: {fileID: 1708617939}
   - component: {fileID: 1708617942}
   - component: {fileID: 1708617941}
-  - component: {fileID: 1708617940}
   m_Layer: 5
   m_Name: cardKanan (1)
   m_TagString: Untagged
@@ -9923,50 +9809,6 @@ RectTransform:
   m_AnchoredPosition: {x: 347, y: -96}
   m_SizeDelta: {x: 491, y: 472}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1708617940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1708617938}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1708617941}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1708617941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11294,7 +11136,6 @@ GameObject:
   - component: {fileID: 1914307664}
   - component: {fileID: 1914307667}
   - component: {fileID: 1914307666}
-  - component: {fileID: 1914307665}
   m_Layer: 5
   m_Name: cardKiri (1)
   m_TagString: Untagged
@@ -11322,62 +11163,6 @@ RectTransform:
   m_AnchoredPosition: {x: -333, y: -94}
   m_SizeDelta: {x: 491, y: 472}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1914307665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914307663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1914307666}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2135523062}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &1914307666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12650,7 +12435,8 @@ MonoBehaviour:
   decisionPanel: {fileID: 75671533}
   dialogueBox: {fileID: 1364066614}
   cutscene: {fileID: 52907499}
-  scriptJalanLyra: {fileID: 1632986394}
+  playerMovement: {fileID: 1632986394}
+  playerRb: {fileID: 1632986402}
 --- !u!61 &2135523064
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12725,3 +12511,4 @@ SceneRoots:
   - {fileID: 2135523065}
   - {fileID: 52907500}
   - {fileID: 915891854}
+  - {fileID: 476382627}

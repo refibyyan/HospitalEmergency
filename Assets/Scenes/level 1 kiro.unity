@@ -539,6 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e118997ee9393304faaa41e7afa8fec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneTyping
+  esp32Input: {fileID: 1332241401}
   cutscenePanel: {fileID: 1081336823}
   dialogueText: {fileID: 827751956}
   dialogLines:
@@ -837,6 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff86450024a453141ac1d75d3579cc5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MekanikDecision
+  esp32Input: {fileID: 1332241401}
   cardKiriUI: {fileID: 1914307666}
   cardKananUI: {fileID: 1708617941}
   audioSource: {fileID: 75671538}
@@ -852,14 +854,14 @@ MonoBehaviour:
   winPanel: {fileID: 790272435}
   gameOverPanel: {fileID: 74958326}
   proceedButton: {fileID: 859751782}
-  buttonRestartUI: {fileID: 0}
-  buttonExitUI: {fileID: 0}
-  restartButton: {fileID: 0}
-  exitButton: {fileID: 0}
-  restartIjo: {fileID: 0}
-  restartPolos: {fileID: 0}
-  exitIjo: {fileID: 0}
-  exitPolos: {fileID: 0}
+  buttonRestartUI: {fileID: 1007620415}
+  buttonExitUI: {fileID: 2118696983}
+  restartButton: {fileID: 1007620414}
+  exitButton: {fileID: 2118696982}
+  restartIjo: {fileID: 21300000, guid: decaa981c3a27174484cf2682825e542, type: 3}
+  restartPolos: {fileID: 21300000, guid: ea85673719c36244a8b7abb147a29a08, type: 3}
+  exitIjo: {fileID: 21300000, guid: 0224ba014b034b044abd4e45e0699a8b, type: 3}
+  exitPolos: {fileID: 21300000, guid: a8149bf91c3584e4bbda98875f35be80, type: 3}
   restartText: {fileID: 0}
   exitText: {fileID: 0}
   timerSource: {fileID: 75671538}
@@ -3761,7 +3763,7 @@ PrefabInstance:
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: espInput
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1332241401}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
@@ -3781,6 +3783,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1595006232}
   m_SourcePrefab: {fileID: 100100000, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+--- !u!50 &644166475 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 1379921149426068556, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+  m_PrefabInstance: {fileID: 644166474}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &656935855
 GameObject:
   m_ObjectHideFlags: 0
@@ -5748,81 +5755,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 6.992546, y: 1.5424716}
   m_EdgeRadius: 0
---- !u!1 &1012009299
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1012009300}
-  - component: {fileID: 1012009302}
-  - component: {fileID: 1012009301}
-  m_Layer: 5
-  m_Name: background
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1012009300
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1081336824}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1012009301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: -7040597880176113311, guid: dc2a6b91daf8c62459630de4608e9435, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1012009302
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012009299}
-  m_CullTransparentMesh: 1
 --- !u!1 &1016010566
 GameObject:
   m_ObjectHideFlags: 0
@@ -6356,7 +6288,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1012009300}
   - {fileID: 2030221601}
   m_Father: {fileID: 254533117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6532,6 +6463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56baf441673dff143bd1b6f489570360, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
+  esp32Input: {fileID: 1332241401}
   dialogBox: {fileID: 1364066614}
   textMeshPro: {fileID: 911948278}
   typingSpeed: 0.07
@@ -7864,6 +7796,59 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.2355237, y: 2.9705443}
   m_EdgeRadius: 0
+--- !u!1 &1332241400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1332241402}
+  - component: {fileID: 1332241401}
+  m_Layer: 0
+  m_Name: ESP32Input
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1332241401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332241400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
+  portName: COM3
+  baudRate: 115200
+  joystickSensitivity: 0.5
+  joystickMoveMultiplier: 4
+  horizontal: 0
+  vertical: 0
+  selectPressed: 0
+  selectHeld: 0
+  isConnected: 1
+--- !u!4 &1332241402
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332241400}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.73242, y: 3.74181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1351260178
 GameObject:
   m_ObjectHideFlags: 0
@@ -12689,7 +12674,8 @@ MonoBehaviour:
   decisionPanel: {fileID: 75671533}
   dialogueBox: {fileID: 1364066614}
   cutscene: {fileID: 52907499}
-  scriptJalanLyra: {fileID: 1595006241}
+  playerMovement: {fileID: 1595006241}
+  playerRb: {fileID: 644166475}
 --- !u!61 &2135523064
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12764,3 +12750,4 @@ SceneRoots:
   - {fileID: 2135523065}
   - {fileID: 52907500}
   - {fileID: 915891854}
+  - {fileID: 1332241402}

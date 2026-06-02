@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,13 +63,11 @@ public class Select : MonoBehaviour
 
         if (esp32Input != null && esp32Input.isConnected)
         {
-            // Deteksi horizontal dari komponen X (bisa dibuat manual di ESP32Input atau dibaca langsung)
-            // Asumsi: Kita gunakan pergerakan horizontal ESP32 jika ada (jika script ESP32Input kamu punya properti horizontal)
             if (Mathf.Abs(esp32Input.horizontal) > 0.5f) horizontalInput = esp32Input.horizontal;
             if (Mathf.Abs(esp32Input.vertical) > 0.5f) verticalInput = esp32Input.vertical;
         }
 
-        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return);
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
         if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
         {
             isConfirmPressed = true;
@@ -113,12 +111,18 @@ public class Select : MonoBehaviour
             isJoystickVerticalInUse = false;
         }
 
+        // Tambahan input tombol keyboard cadangan (A/D & W/S)
+        if (Input.GetKeyDown(KeyCode.A)) navigateLeft = true;
+        if (Input.GetKeyDown(KeyCode.D)) navigateRight = true;
+        if (Input.GetKeyDown(KeyCode.W)) navigateUp = true;
+        if (Input.GetKeyDown(KeyCode.S)) navigateDown = true;
+
         // -----------------------------------------------------------------
         // LOGIKA SELEKSI KARAKTER & POP-UP
         // -----------------------------------------------------------------
         if (!isPopUpActive)
         {
-            // Navigasi Utama Kiri / Kanan
+            // Navigasi Utama Kiri / Kanan (Looping & Menyambung Sempurna)
             if (navigateLeft || navigateRight)
             {
                 PlaySFX(selectingSound);
@@ -129,6 +133,7 @@ public class Select : MonoBehaviour
             {
                 GameObject current = EventSystem.current.currentSelectedGameObject;
 
+                // Memastikan pengecekan berdasarkan tombol yang saat ini AKTIF di-highlight secara presisi
                 if (current == kiroButton.gameObject)
                 {
                     activeCharacter = "Kiro";
@@ -145,7 +150,7 @@ public class Select : MonoBehaviour
         }
         else
         {
-            // Di dalam Pop Up (Navigasi Atas / Bawah)
+            // Di dalam Pop Up (Navigasi Atas / Bawah untuk Konfirmasi)
             if (navigateUp || navigateDown)
             {
                 isConfirmSelected = !isConfirmSelected;
@@ -170,10 +175,11 @@ public class Select : MonoBehaviour
         }
     }
 
-    // Mengurus paksa focus UI Button saat menggunakan Joystick ESP32
+    // Mengurus paksa focus UI Button secara looping melingkar tanpa putus
     private void NavigateMainSelection(bool left)
     {
         GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+
         if (currentSelected == null)
         {
             kiroButton.Select();
@@ -182,11 +188,27 @@ public class Select : MonoBehaviour
 
         if (left)
         {
-            if (currentSelected == lyraButton.gameObject) kiroButton.Select();
+            // Jika di Kiro (paling kiri) dipaksa geser kiri, dia akan melompat secara mulus ke Lyra (paling kanan)
+            if (currentSelected == kiroButton.gameObject)
+            {
+                lyraButton.Select();
+            }
+            else if (currentSelected == lyraButton.gameObject)
+            {
+                kiroButton.Select();
+            }
         }
         else // Right
         {
-            if (currentSelected == kiroButton.gameObject) lyraButton.Select();
+            // Jika di Lyra (paling kanan) dipaksa geser kanan, dia akan berputar kembali ke Kiro (paling kiri)
+            if (currentSelected == lyraButton.gameObject)
+            {
+                kiroButton.Select();
+            }
+            else if (currentSelected == kiroButton.gameObject)
+            {
+                lyraButton.Select();
+            }
         }
     }
 
@@ -216,7 +238,7 @@ public class Select : MonoBehaviour
         {
             kiroImage.sprite = isConfirmSelected ? kiroConfirmSprite : kiroCancelSprite;
         }
-        else
+        else if (activeCharacter == "Lyra")
         {
             lyraImage.sprite = isConfirmSelected ? lyraConfirmSprite : lyraCancelSprite;
         }

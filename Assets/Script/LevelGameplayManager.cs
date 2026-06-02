@@ -30,6 +30,8 @@ public class LevelGameplayManager : MonoBehaviour
     public AudioClip sfxSuccessPopUp;
     public AudioClip sfxSuccessConfirm;
     public AudioClip sfxSelecting; // Opsional: Tambahkan sfx pindah menu bad ending jika ada
+    [Tooltip("Masukkan SFX / Lagu Backsound khusus saat slide ending berjalan")]
+    public AudioClip sfxEndingBGM;
 
     [Header("--- SCENE / EXIT SYSTEM ---")]
     public string nextSceneName = "Main Menu";
@@ -477,6 +479,14 @@ public class LevelGameplayManager : MonoBehaviour
     {
         if (endingDisplay == null) yield break;
 
+        // 🎵 MAIN KAN AUDIO ENDING SEBELUM SLIDE MULAI MUNCUL
+        if (audioSource != null && sfxEndingBGM != null)
+        {
+            audioSource.clip = sfxEndingBGM;
+            audioSource.loop = true; // Set lagu berputar terus selama slide aktif
+            audioSource.Play();
+        }
+
         if (endingFadeCanvasGroup != null)
         {
             endingFadeCanvasGroup.gameObject.SetActive(true);
@@ -499,6 +509,13 @@ public class LevelGameplayManager : MonoBehaviour
                 yield return StartCoroutine(FadeCustomCanvasGroup(endingFadeCanvasGroup, 0f, 1f, 0.7f));
 
             yield return new WaitForSeconds(0.2f);
+        }
+
+        // 🎵 BERHENTIKAN AUDIO KETIKA SLIDE SELESAI
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            audioSource.loop = false;
         }
 
         Debug.Log("[LevelGameplayManager] Selesai memutar slide dengan FadeImage baru. Memuat Main Menu...");

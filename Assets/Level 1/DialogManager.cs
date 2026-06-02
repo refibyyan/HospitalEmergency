@@ -1,9 +1,12 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using TMPro;
 
 public class DialogManager : MonoBehaviour
 {
+    [Header("--- ESP32 INPUT REFERENCE ---")]
+    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
+
     [Header("UI Elemen")]
     public GameObject dialogBox;
     public TextMeshProUGUI textMeshPro;
@@ -22,15 +25,22 @@ public class DialogManager : MonoBehaviour
 
     private Coroutine typingCoroutine;
     private int index;
+    private bool isDialogActive = false;
 
     void Start()
     {
+        // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
+        if (esp32Input == null)
+        {
+            esp32Input = FindFirstObjectByType<ESP32Input>();
+        }
+
         StartCoroutine(WaitBeforeStart());
     }
 
     IEnumerator WaitBeforeStart()
     {
-        dialogBox.SetActive(false);
+        if (dialogBox != null) dialogBox.SetActive(false);
 
         yield return new WaitForSeconds(startDelay);
 
@@ -39,8 +49,9 @@ public class DialogManager : MonoBehaviour
 
     public void StartDialog()
     {
-        dialogBox.SetActive(true);
+        if (dialogBox != null) dialogBox.SetActive(true);
         index = 0;
+        isDialogActive = true;
 
         typingCoroutine = StartCoroutine(TypeLine());
     }
@@ -67,12 +78,21 @@ public class DialogManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+        if (!isDialogActive) return;
+
+        // 🔥 DETEKSI INPUT HYBRID (Keyboard Enter OR Mouse Click OR ESP32 Select Button)
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
+                                Input.GetMouseButtonDown(0) ||
+                                (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
+
+        if (isConfirmPressed)
         {
+            // Jika teks sudah selesai diketik seluruhnya -> Lanjut baris berikutnya
             if (textMeshPro.text == dialogLines[index])
             {
                 NextLine();
             }
+            // Jika teks masih dalam proses mengetik -> Skip langsung tampilkan penuh
             else
             {
                 if (typingCoroutine != null)
@@ -110,8 +130,9 @@ public class DialogManager : MonoBehaviour
                 typingSource.Stop();
             }
 
-            dialogBox.SetActive(false);
+            if (dialogBox != null) dialogBox.SetActive(false);
             textMeshPro.text = "";
+            isDialogActive = false;
 
             Debug.Log("Dialog Selesai! Pemain sekarang bisa jalan.");
         }

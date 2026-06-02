@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class MekanikDecision : MonoBehaviour
 {
+    [Header("--- ESP32 INPUT REFERENCE ---")]
+    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
+
     [Header("Object UI Decision")]
     public Image cardKiriUI;
     public Image cardKananUI;
@@ -67,6 +70,12 @@ public class MekanikDecision : MonoBehaviour
     public AudioSource monitorSource;
     public AudioClip monitorJantung;
 
+    // Tracker State internal untuk simulasi GetKeyDown (Mencegah spam menu/card)
+    private bool espLeftHoldLastFrame = false;
+    private bool espRightHoldLastFrame = false;
+    private bool espLeftThumbPressed = false;
+    private bool espRightThumbPressed = false;
+
     void Start()
     {
         waktuBerjalan = waktuMaksimal;
@@ -90,13 +99,16 @@ public class MekanikDecision : MonoBehaviour
             proceedButton.onClick.AddListener(LanjutLevel2);
 
         if (restartButton != null)
+        {
             restartButton.onClick.AddListener(() =>
             {
                 Time.timeScale = 1f;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             });
+        }
 
         if (exitButton != null)
+        {
             exitButton.onClick.AddListener(() =>
             {
                 Application.Quit();
@@ -104,6 +116,7 @@ public class MekanikDecision : MonoBehaviour
                 UnityEditor.EditorApplication.isPlaying = false;
 #endif
             });
+        }
 
         if (timerSource != null && timerSFX != null)
         {
@@ -112,12 +125,21 @@ public class MekanikDecision : MonoBehaviour
             timerSource.Play();
         }
 
+        // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
+        if (esp32Input == null)
+        {
+            esp32Input = FindFirstObjectByType<ESP32Input>();
+        }
+
         UpdatePilihanCard();
         UpdateGameOverButton();
     }
 
     void Update()
     {
+        // Jalankan pemrosesan threshold joystick & WASD secara hybrid
+        HandleESP32JoystickThresholds();
+
         if (isGameOverActive)
         {
             NavigasiGameOver();
@@ -125,7 +147,10 @@ public class MekanikDecision : MonoBehaviour
         }
 
         if (gameSelesai)
+        {
+            HandleWinPanelInput();
             return;
+        }
 
         UpdateTimer();
         InputPilihan();
@@ -154,7 +179,8 @@ public class MekanikDecision : MonoBehaviour
 
     void InputPilihan()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        // Input KIRI Hybrid
+        if (espLeftThumbPressed)
         {
             pilihKiri = true;
             UpdatePilihanCard();
@@ -163,7 +189,8 @@ public class MekanikDecision : MonoBehaviour
                 audioSource.PlayOneShot(chooseClick);
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        // Input KANAN Hybrid
+        if (espRightThumbPressed)
         {
             pilihKiri = false;
             UpdatePilihanCard();
@@ -172,7 +199,12 @@ public class MekanikDecision : MonoBehaviour
                 audioSource.PlayOneShot(chooseClick);
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        // Input KONFIRMASI Hybrid
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
+                                Input.GetKeyDown(KeyCode.Space) ||
+                                (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
+
+        if (isConfirmPressed)
         {
             if (pilihKiri)
                 Menang();
@@ -183,6 +215,7 @@ public class MekanikDecision : MonoBehaviour
 
     void UpdatePilihanCard()
     {
+        // FIX: Sekarang visual card kanan/kiri berubah dinamis mengikuti nilai boolean 'pilihKiri'
         if (pilihKiri)
         {
             if (cardKiriUI != null) cardKiriUI.sprite = gambarKiriIjo;
@@ -218,9 +251,19 @@ public class MekanikDecision : MonoBehaviour
             audioSource.PlayOneShot(chooseClick);
 
         Time.timeScale = 1f;
-
-        // Memanggil scene transisi Loading 1 to 2
         SceneManager.LoadScene("Loading 1 to 2");
+    }
+
+    void HandleWinPanelInput()
+    {
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
+                                Input.GetKeyDown(KeyCode.Space) ||
+                                (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
+
+        if (isConfirmPressed && winPanel != null && winPanel.activeSelf)
+        {
+            LanjutLevel2();
+        }
     }
 
     void TriggerGameOver()
@@ -284,19 +327,23 @@ public class MekanikDecision : MonoBehaviour
 
     void NavigasiGameOver()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (espLeftThumbPressed)
         {
             pilihRestart = true;
             UpdateGameOverButton();
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        if (espRightThumbPressed)
         {
             pilihRestart = false;
             UpdateGameOverButton();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
+                                Input.GetKeyDown(KeyCode.Space) ||
+                                (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
+
+        if (isConfirmPressed)
         {
             if (pilihRestart)
             {
@@ -306,11 +353,70 @@ public class MekanikDecision : MonoBehaviour
             else
             {
                 Application.Quit();
-
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
 #endif
             }
+        }
+    }
+
+    void HandleESP32JoystickThresholds()
+    {
+        espLeftThumbPressed = false;
+        espRightThumbPressed = false;
+
+        // 1. Ambil input keyboard/WASD standar Unity
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        // 2. Ambil nilai joystick dari script ESP32Input
+        float espHorizontal = 0f;
+        if (esp32Input != null && esp32Input.isConnected)
+        {
+            // 💡 FIX: Menggunakan refleksi otomatis untuk mendeteksi variabel joystick apa pun di ESP32Input.cs Anda
+            // (Mencari otomatis jika namanya: horizontalValue, joystickX, atau horizontal)
+            var type = esp32Input.GetType();
+            var fieldHorizontal = type.GetField("horizontalValue") ?? type.GetField("joystickX") ?? type.GetField("horizontal");
+
+            if (fieldHorizontal != null)
+            {
+                espHorizontal = (float)fieldHorizontal.GetValue(esp32Input);
+            }
+            else
+            {
+                // Jika sistem otomatis tidak mendeteksi nama variabel di script Anda, ganti manual baris di bawah ini:
+                espHorizontal = horizontalInput;
+            }
+        }
+
+        // 3. Gabungkan deteksi mentah (Raw Input)
+        bool leftRaw = (horizontalInput < -0.5f) || (espHorizontal < -0.5f) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
+        bool rightRaw = (horizontalInput > 0.5f) || (espHorizontal > 0.5f) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
+
+        // --- Edge-Detection (Anti-Spam / Simulasi GetKeyDown) ---
+        if (leftRaw)
+        {
+            if (!espLeftHoldLastFrame)
+            {
+                espLeftThumbPressed = true;
+                espLeftHoldLastFrame = true;
+            }
+        }
+        else
+        {
+            espLeftHoldLastFrame = false;
+        }
+
+        if (rightRaw)
+        {
+            if (!espRightHoldLastFrame)
+            {
+                espRightThumbPressed = true;
+                espRightHoldLastFrame = true;
+            }
+        }
+        else
+        {
+            espRightHoldLastFrame = false;
         }
     }
 }

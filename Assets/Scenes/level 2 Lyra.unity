@@ -1271,7 +1271,6 @@ GameObject:
   - component: {fileID: 181142437}
   - component: {fileID: 181142436}
   - component: {fileID: 181142435}
-  - component: {fileID: 181142438}
   m_Layer: 5
   m_Name: TMP Text
   m_TagString: Untagged
@@ -1400,24 +1399,6 @@ RectTransform:
   m_AnchoredPosition: {x: 11.139404, y: -14}
   m_SizeDelta: {x: 1400.927, y: 118.2002}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &181142438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 181142434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 614811300ed6ecf4ea406b25fd078aec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TypewriterEffect
-  typingSpeed: 0.05
-  startDelay: 0
-  sfxSource: {fileID: 0}
-  typingSound: {fileID: 0}
-  minTimeBetweenSounds: 0.1
-  soundSessions: []
 --- !u!1 &254533113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2084,6 +2065,7 @@ GameObject:
   - component: {fileID: 466959722}
   - component: {fileID: 466959723}
   - component: {fileID: 466959724}
+  - component: {fileID: 466959725}
   m_Layer: 0
   m_Name: Restart Trigger
   m_TagString: Untagged
@@ -2165,6 +2147,106 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RestartTrigger
   quickDecisionManager: {fileID: 487723349}
+  audioSource: {fileID: 466959725}
+  triggerSFX: {fileID: 8300000, guid: 4ec8463e44b340e45a26916efd34cf0d, type: 3}
+  volume: 1
+--- !u!82 &466959725
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466959721}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &468922904
 GameObject:
   m_ObjectHideFlags: 0
@@ -2617,7 +2699,7 @@ MonoBehaviour:
   timerDuration: 15
   timerTemplate: {fileID: 2062993689}
   timerText: {fileID: 157017004}
-  missionTimerDuration: 20
+  missionTimerDuration: 30
   audioSource: {fileID: 487723351}
   selectSFX: {fileID: 8300000, guid: 809a4b86bcb36b640a6bffdcc34b4be3, type: 3}
   confirmSFX: {fileID: 8300000, guid: d4036f5688cab3b45a7c8d4c8806956f, type: 3}
@@ -2904,6 +2986,7 @@ GameObject:
   - component: {fileID: 538200666}
   - component: {fileID: 538200664}
   - component: {fileID: 538200665}
+  - component: {fileID: 538200667}
   m_Layer: 0
   m_Name: Generator Trigger
   m_TagString: Untagged
@@ -2970,6 +3053,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GeneratorTrigger
   quickDecisionManager: {fileID: 487723349}
+  audioSource: {fileID: 538200667}
+  triggerSFX: {fileID: 8300000, guid: 4ec8463e44b340e45a26916efd34cf0d, type: 3}
+  volume: 1
 --- !u!4 &538200666
 Transform:
   m_ObjectHideFlags: 0
@@ -2985,6 +3071,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1708967727}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &538200667
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 538200663}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &557072198
 GameObject:
   m_ObjectHideFlags: 0
@@ -6458,6 +6641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f98a8fb78dae848488c38bc6dc788fdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoctorDialogueTrigger
+  esp32Input: {fileID: 1336845849}
   sceneIntroManager: {fileID: 2012722489}
   doctorDialogues:
   - playerName: Lyra
@@ -7403,7 +7587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
-  portName: COM5
+  portName: COM3
   baudRate: 115200
   joystickSensitivity: 0.5
   joystickMoveMultiplier: 0.5

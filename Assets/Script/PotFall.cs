@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -7,24 +7,22 @@ using TMPro;
 [System.Serializable]
 public class PotDialogue
 {
-    [Header("Player Name")]
     public string playerName;
 
     [TextArea]
     public string dialogueText;
 
-    [Header("Typing")]
     public float textSpeed = 0.03f;
-
-    [Header("Delay After Dialogue")]
     public float textDelay = 0.5f;
 
-    [Header("Dialogue Audio")]
     public AudioClip dialogueSFX;
 }
 
 public class PotFall : MonoBehaviour
 {
+    [Header("--- ESP32 INPUT REFERENCE ---")]
+    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
+
     [Header("Sprite")]
     public Sprite standingSprite;
     public Sprite fallenSprite;
@@ -38,18 +36,14 @@ public class PotFall : MonoBehaviour
 
     [Header("Dialogue")]
     public GameObject dialogueBox;
-
     public TMP_Text dialogueTMP;
-
     public TMP_Text playerNameTMP;
 
     [Header("Pot Dialogues")]
-    public List<PotDialogue> potDialogues =
-        new List<PotDialogue>();
+    public List<PotDialogue> potDialogues = new List<PotDialogue>();
 
     [Header("Global Light")]
     public Light2D globalLight;
-
     public float targetIntensity = 0.02f;
 
     [Header("Character Light")]
@@ -63,55 +57,82 @@ public class PotFall : MonoBehaviour
     private AudioSource dialogueAudioSource;
 
     private bool hasFallen = false;
-
-    // Berlaku untuk semua pot
     private bool eventAlreadyTriggered = false;
+
+    // 🔥 CONTROL SKIP
+    private int currentIndex = 0;
+    private bool isTyping = false;
+    private bool isDone = false;
+    private Coroutine typingCoroutine;
+    private bool isDialoguePlaying = false;
 
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
+        dialogueAudioSource = gameObject.AddComponent<AudioSource>();
 
-        audioSource =
-            GetComponent<AudioSource>();
-
-        dialogueAudioSource =
-            gameObject.AddComponent<AudioSource>();
-
-        if (sr != null &&
-            standingSprite != null)
-        {
+        if (sr != null && standingSprite != null)
             sr.sprite = standingSprite;
-        }
 
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(false);
-        }
 
-        // Lampu player awal OFF
         if (playerLight != null)
-        {
             playerLight.enabled = false;
+
+        // Otomatis mencari script ESP32Input jika lupa di-drag di Inspector
+        if (esp32Input == null)
+        {
+            esp32Input = FindFirstObjectByType<ESP32Input>();
         }
     }
 
     void Update()
     {
-        if (hasFallen)
-            return;
-
-        if (player == null)
-            return;
-
-        float distance =
-            Vector2.Distance(
-                transform.position,
-                player.position
-            );
-
-        if (distance <= triggerDistance)
+        if (!hasFallen && player != null)
         {
-            FallPot();
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            if (distance <= triggerDistance)
+            {
+                FallPot();
+            }
+        }
+
+        // 🔥 HANDLE SKIP HYBRID
+        if (isDialoguePlaying)
+        {
+            // Ambil input konfirmasi secara Hybrid (Keyboard Enter ATAU ESP32 Select)
+            bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return);
+
+            if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
+            {
+                isConfirmPressed = true;
+            }
+
+            if (isConfirmPressed)
+            {
+                // Kalau sedang mengetik -> langsung tampilkan semua teks utuh
+                if (isTyping && !isDone)
+                {
+                    if (typingCoroutine != null)
+                        StopCoroutine(typingCoroutine);
+
+                    ShowFullText(potDialogues[currentIndex]);
+
+                    if (dialogueAudioSource != null)
+                        dialogueAudioSource.Stop();
+
+                    isTyping = false;
+                    isDone = true;
+                }
+                // Kalau sudah selesai ngetik -> lanjut ke baris dialog berikutnya
+                else if (isDone)
+                {
+                    NextDialogue();
+                }
+            }
         }
     }
 
@@ -119,117 +140,84 @@ public class PotFall : MonoBehaviour
     {
         hasFallen = true;
 
-        // Ganti sprite
-        if (sr != null &&
-            fallenSprite != null)
-        {
+        if (sr != null && fallenSprite != null)
             sr.sprite = fallenSprite;
-        }
 
-        // Rotasi jatuh
-        transform.rotation =
-            Quaternion.Euler(
-                0f,
-                0f,
-                -90f
-            );
+        transform.rotation = Quaternion.Euler(0f, 0f, -90f);
 
-        // SFX pot
-        if (audioSource != null &&
-            breakSound != null)
-        {
-            audioSource.PlayOneShot(
-                breakSound
-            );
-        }
+        if (audioSource != null && breakSound != null)
+            audioSource.PlayOneShot(breakSound);
 
-        // Event utama hanya sekali
-        if (eventAlreadyTriggered)
-            return;
+        if (eventAlreadyTriggered) return;
 
         eventAlreadyTriggered = true;
 
-        StartCoroutine(
-            StorySequence()
-        );
+        StartCoroutine(StorySequence());
     }
 
     IEnumerator StorySequence()
     {
-        // Dunia gelap
         if (globalLight != null)
-        {
-            globalLight.intensity =
-                targetIntensity;
-        }
+            globalLight.intensity = targetIntensity;
 
-        // Lampu Lyra nyala
         if (playerLight != null)
-        {
             playerLight.enabled = true;
-        }
 
-        // Tampilkan dialog
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(true);
-        }
 
-        foreach (PotDialogue dialogue in potDialogues)
-        {
-            yield return StartCoroutine(
-                TypeWriter(dialogue)
-            );
+        // mulai sistem dialog baru
+        isDialoguePlaying = true;
+        currentIndex = 0;
 
-            yield return new WaitForSeconds(
-                dialogue.textDelay
-            );
-        }
+        typingCoroutine = StartCoroutine(TypeWriter(potDialogues[currentIndex]));
 
-        // Tutup dialog
+        yield return new WaitUntil(() => !isDialoguePlaying);
+
         if (dialogueBox != null)
-        {
             dialogueBox.SetActive(false);
-        }
 
-        // Mulai timer
         if (gameplayManager != null)
+            gameplayManager.StartTimerAfterPotDialogue();
+    }
+
+    void NextDialogue()
+    {
+        currentIndex++;
+
+        if (currentIndex < potDialogues.Count)
         {
-            gameplayManager
-                .StartTimerAfterPotDialogue();
+            typingCoroutine = StartCoroutine(TypeWriter(potDialogues[currentIndex]));
+        }
+        else
+        {
+            EndDialogue();
         }
     }
 
-    IEnumerator TypeWriter(
-        PotDialogue data)
+    void EndDialogue()
     {
-        if (dialogueTMP == null)
-            yield break;
+        isDialoguePlaying = false;
+    }
+
+    IEnumerator TypeWriter(PotDialogue data)
+    {
+        isTyping = true;
+        isDone = false;
 
         dialogueTMP.text = "";
 
         if (playerNameTMP != null)
-        {
-            playerNameTMP.text =
-                data.playerName;
-        }
+            playerNameTMP.text = data.playerName;
 
-        string cleanText =
-            data.dialogueText
-            .Replace("\n", "")
-            .Replace("\r", "")
-            .Trim();
+        string cleanText = data.dialogueText.Replace("\n", "").Replace("\r", "").Trim();
 
-        // Audio dialog
+        // 🔊 PLAY SFX LOOP
         if (data.dialogueSFX != null)
         {
             dialogueAudioSource.Stop();
-
-            dialogueAudioSource.clip =
-                data.dialogueSFX;
-
+            dialogueAudioSource.clip = data.dialogueSFX;
             dialogueAudioSource.loop = true;
-
             dialogueAudioSource.Play();
         }
 
@@ -238,14 +226,23 @@ public class PotFall : MonoBehaviour
             dialogueTMP.text += c;
 
             dialogueTMP.ForceMeshUpdate();
-
             Canvas.ForceUpdateCanvases();
 
-            yield return new WaitForSeconds(
-                data.textSpeed
-            );
+            yield return new WaitForSeconds(data.textSpeed);
         }
 
+        // 🔊 STOP SFX
         dialogueAudioSource.Stop();
+
+        isTyping = false;
+        isDone = true;
+    }
+
+    void ShowFullText(PotDialogue data)
+    {
+        dialogueTMP.text = data.dialogueText;
+
+        if (playerNameTMP != null)
+            playerNameTMP.text = data.playerName;
     }
 }

@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class LevelGameplayManager : MonoBehaviour
 {
+    [Header("--- ESP32 INPUT REFERENCE ---")]
+    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
+
     [Header("--- FADE SYSTEM ---")]
     public CanvasGroup fadeCanvasGroup;
     public float fadeDuration = 3f;
@@ -26,6 +29,7 @@ public class LevelGameplayManager : MonoBehaviour
     public AudioClip sfxTimerEnd;
     public AudioClip sfxSuccessPopUp;
     public AudioClip sfxSuccessConfirm;
+    public AudioClip sfxSelecting; // Opsional: Tambahkan sfx pindah menu bad ending jika ada
 
     [Header("--- SCENE / EXIT SYSTEM ---")]
     public string nextSceneName = "Main Menu";
@@ -62,6 +66,9 @@ public class LevelGameplayManager : MonoBehaviour
     private bool isSelectingRestart = true;
     private bool waitingSuccessInput = false;
 
+    // Kunci Anti-Spam Joystick
+    private bool isJoystickHorizontalInUse = false;
+
     void Start()
     {
         if (popUpCanvasGroup != null)
@@ -70,6 +77,12 @@ public class LevelGameplayManager : MonoBehaviour
         }
 
         DeactivateAllEndingUI();
+
+        // Otomatis mencari script ESP32Input jika lupa di-drag di Inspector
+        if (esp32Input == null)
+        {
+            esp32Input = FindFirstObjectByType<ESP32Input>();
+        }
 
         if (fadeCanvasGroup != null)
         {
@@ -130,11 +143,11 @@ public class LevelGameplayManager : MonoBehaviour
         }
 
         // =====================================
-        // BAD ENDING INPUT
+        // BAD ENDING INPUT (HYBRID)
         // =====================================
         if (isBadEndingActive)
         {
-            HandleBadEndingInput();
+            HandleBadEndingInputHybrid();
         }
 
         // =====================================
@@ -155,7 +168,6 @@ public class LevelGameplayManager : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    // Fungsi bawaan (Fallback) jika game over dipicu oleh waktu habis (mencari lyra_depan)
     void FreezePlayer()
     {
         GameObject player = GameObject.Find("lyra_depan");
@@ -170,19 +182,16 @@ public class LevelGameplayManager : MonoBehaviour
         }
     }
 
-    // Fungsi baru untuk membekukan player secara dinamis & MENGEHENTIKAN SFX LANGKAH KAKI
     void FreezePlayerDynamic(GameObject player)
     {
         if (player != null)
         {
-            // 1. Hentikan kecepatan fisika Rigidbody2D
             Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
             }
 
-            // 2. MATIKAN SFX DERAP LANGKAH KAKI PADA PLAYER (Mencari AudioSource di objek ini & anak objeknya)
             AudioSource[] playerAudioSources = player.GetComponentsInChildren<AudioSource>();
             foreach (AudioSource pAudio in playerAudioSources)
             {
@@ -192,7 +201,6 @@ public class LevelGameplayManager : MonoBehaviour
                 }
             }
 
-            // 3. Matikan semua script pergerakan/input di objek player tersebut
             MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
             foreach (MonoBehaviour script in scripts)
             {
@@ -203,7 +211,7 @@ public class LevelGameplayManager : MonoBehaviour
     }
 
     // =====================================
-    // BAD ENDING
+    // BAD ENDING MANAGEMENT
     // =====================================
     void TimerGameOver()
     {
@@ -286,27 +294,56 @@ public class LevelGameplayManager : MonoBehaviour
             Canvas.ForceUpdateCanvases();
     }
 
-    void HandleBadEndingInput()
+    // Penanganan Input Hybrid Khusus Bad Ending (Keyboard + Joystick ESP32)
+    void HandleBadEndingInputHybrid()
     {
-        bool changed = false;
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        if (esp32Input != null && esp32Input.isConnected)
         {
-            if (!isSelectingRestart)
+            if (Mathf.Abs(esp32Input.horizontal) > 0.5f)
             {
-                isSelectingRestart = true;
-                changed = true;
-                Debug.Log("[LevelGameplayManager] Pilihan berubah ke: RESTART");
+                horizontalInput = esp32Input.horizontal;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+
+        bool navigateLeft = false;
+        bool navigateRight = false;
+
+        // One-Shot behavior untuk navigasi horizontal stik/tombol arah
+        if (horizontalInput != 0)
         {
-            if (isSelectingRestart)
+            if (!isJoystickHorizontalInUse)
             {
-                isSelectingRestart = false;
-                changed = true;
-                Debug.Log("[LevelGameplayManager] Pilihan berubah ke: EXIT");
+                if (horizontalInput < -0.3f) navigateLeft = true;
+                if (horizontalInput > 0.3f) navigateRight = true;
+                isJoystickHorizontalInUse = true;
             }
+        }
+        else
+        {
+            isJoystickHorizontalInUse = false;
+        }
+
+        // Tambahan tombol keyboard A/D bawaan
+        if (Input.GetKeyDown(KeyCode.A)) navigateLeft = true;
+        if (Input.GetKeyDown(KeyCode.D)) navigateRight = true;
+
+        bool changed = false;
+
+        if (navigateLeft && !isSelectingRestart)
+        {
+            isSelectingRestart = true;
+            changed = true;
+            if (sfxSelecting != null && audioSource != null) audioSource.PlayOneShot(sfxSelecting);
+            Debug.Log("[LevelGameplayManager] Pilihan berubah ke: RESTART");
+        }
+        else if (navigateRight && isSelectingRestart)
+        {
+            isSelectingRestart = false;
+            changed = true;
+            if (sfxSelecting != null && audioSource != null) audioSource.PlayOneShot(sfxSelecting);
+            Debug.Log("[LevelGameplayManager] Pilihan berubah ke: EXIT");
         }
 
         if (changed)
@@ -314,32 +351,22 @@ public class LevelGameplayManager : MonoBehaviour
             SetBadEndingSprite(isSelectingRestart);
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        // Deteksi tombol Enter/Space pada keyboard ATAU tombol select ESP32
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
+        if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
+        {
+            isConfirmPressed = true;
+        }
+
+        if (isConfirmPressed)
         {
             isBadEndingActive = false;
 
             if (isSelectingRestart)
             {
-                // =====================================
-                // AUTOMATIC SCENE RELOAD
-                // =====================================
                 string activeSceneName = SceneManager.GetActiveScene().name;
-
-                if (activeSceneName == "Level 3")
-                {
-                    Debug.Log("[LevelGameplayManager] Memuat ulang scene utama: Level 3");
-                    SceneManager.LoadScene("Level 3");
-                }
-                else if (activeSceneName == "Level 3 Kiro")
-                {
-                    Debug.Log("[LevelGameplayManager] Memuat ulang scene karakter: Level 3 Kiro");
-                    SceneManager.LoadScene("Level 3 Kiro");
-                }
-                else
-                {
-                    Debug.Log("[LevelGameplayManager] Memuat ulang scene aktif saat ini: " + activeSceneName);
-                    SceneManager.LoadScene(activeSceneName);
-                }
+                Debug.Log("[LevelGameplayManager] Memuat ulang scene aktif saat ini: " + activeSceneName);
+                SceneManager.LoadScene(activeSceneName);
             }
             else
             {
@@ -350,7 +377,7 @@ public class LevelGameplayManager : MonoBehaviour
     }
 
     // =====================================
-    // GOOD ENDING (MODIFIED FOR DYNAMIC FREEZE)
+    // GOOD ENDING MANAGEMENT
     // =====================================
     public void PlayerReachedExit(GameObject playerObject)
     {
@@ -368,9 +395,7 @@ public class LevelGameplayManager : MonoBehaviour
 
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
 
-        // Membekukan pergerakan objek player sekaligus mematikan langkah kakinya
         FreezePlayerDynamic(playerObject);
-
         StartCoroutine(GoodEndingRoutine());
     }
 
@@ -411,11 +436,19 @@ public class LevelGameplayManager : MonoBehaviour
 
         waitingSuccessInput = true;
 
+        // Loop menunggu konfirmasi input Hybrid (Keyboard, Mouse Klik, ESP32 Button)
         while (waitingSuccessInput)
         {
-            if (Input.GetKeyDown(KeyCode.Return) ||
-                Input.GetKeyDown(KeyCode.Space) ||
-                Input.GetMouseButtonDown(0))
+            bool isSuccessConfirmed = Input.GetKeyDown(KeyCode.Return) ||
+                                     Input.GetKeyDown(KeyCode.Space) ||
+                                     Input.GetMouseButtonDown(0);
+
+            if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
+            {
+                isSuccessConfirmed = true;
+            }
+
+            if (isSuccessConfirmed)
             {
                 if (audioSource != null && sfxSuccessConfirm != null)
                     audioSource.PlayOneShot(sfxSuccessConfirm);

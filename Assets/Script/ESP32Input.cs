@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO.Ports;
+using System.Threading;
 using UnityEngine;
 
 public class ESP32Input : MonoBehaviour
@@ -10,42 +11,52 @@ public class ESP32Input : MonoBehaviour
     [SerializeField] private int baudRate = 115200;
 
     [Header("Joystick Settings")]
-    [Range(0.1f, 1f)]
-    public float joystickSensitivity = 0.5f;
-
-    [Range(0.1f, 5f)]
-    public float joystickMoveMultiplier = 1f;
+    [Range(0.1f, 1f)] public float joystickSensitivity = 0.15f; // Rekomendasi: 0.15f agar tidak terlalu sensitif
+    [Range(0.1f, 5f)] public float joystickMoveMultiplier = 1f;
 
     [Header("Live Values")]
     public float horizontal;
     public float vertical;
 
     [Header("Button")]
-    public bool selectPressed;      // one-shot: true hanya 1 frame
-    public bool selectHeld;         // true selama tombol ditekan
+    public bool selectPressed;      // One-shot: true hanya 1 frame saat ditekan
+    public bool selectHeld;         // True selama tombol ditekan
 
     [Header("Connection")]
     public bool isConnected = false;
 
     private SerialPort serialPort;
+    private Thread readThread;
+    private bool isRunning = false;
 
-    private bool lastButtonState = false; // state tombol frame sebelumnya
+    // Variabel thread-safe untuk menampung data dari background thread
+    private string latestSerialData = "";
+    private readonly object dataLock = new object();
 
-    // =========================================
-    // START
-    // =========================================
+    private bool lastButtonState = false;
 
     void Start()
     {
-        serialPort = new SerialPort(portName, baudRate);
-        serialPort.ReadTimeout = 50;
-        serialPort.NewLine = "\n";
+        // Pastikan port ditutup dulu jika sebelumnya masih menggantung
+        CloseSerial();
+
+        serialPort = new SerialPort(portName, baudRate)
+        {
+            ReadTimeout = 50,
+            WriteTimeout = 50,
+            NewLine = "\n"
+        };
 
         try
         {
             serialPort.Open();
             isConnected = true;
-            Debug.Log("[ESP32Input] Connected to " + portName);
+            Debug.Log($"[ESP32Input] Connected to {portName}");
+
+            // Memulai Background Thread untuk membaca data serial
+            isRunning = true;
+            readThread = new Thread(ReadSerialLoop);
+            readThread.Start();
         }
         catch (Exception e)
         {
@@ -54,101 +65,125 @@ public class ESP32Input : MonoBehaviour
         }
     }
 
-    // =========================================
-    // UPDATE
-    // =========================================
-
     void Update()
     {
-        // Reset one-shot tiap frame
+        // 1. Reset one-shot button tiap frame awal
         selectPressed = false;
 
-        if (serialPort == null || !serialPort.IsOpen)
-            return;
+        if (!isConnected) return;
 
+        string dataToParse = "";
+
+        // 2. Ambil data terbaru dari Thread secara aman (Thread-safe)
+        lock (dataLock)
+        {
+            dataToParse = latestSerialData;
+        }
+
+        if (string.IsNullOrEmpty(dataToParse)) return;
+
+        // 3. Proses Parsing Data di Main Thread Unity
         try
         {
-            string data = serialPort.ReadLine();
-
-            data = data.Trim().Replace("\r", "").Replace("\n", "");
-
-            if (string.IsNullOrEmpty(data))
-                return;
-
-            // FORMAT: x,y,button
-            string[] val = data.Split(',');
+            string[] val = dataToParse.Split(',');
 
             if (val.Length >= 3)
             {
-                bool okX = float.TryParse(
-                    val[0].Trim(),
-                    NumberStyles.Float,
-                    CultureInfo.InvariantCulture,
-                    out float x
-                );
+                bool okX = float.TryParse(val[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float x);
+                bool okY = float.TryParse(val[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float y);
+                bool okButton = int.TryParse(val[2].Trim(), out int btn);
 
-                bool okY = float.TryParse(
-                    val[1].Trim(),
-                    NumberStyles.Float,
-                    CultureInfo.InvariantCulture,
-                    out float y
-                );
-
-                bool okButton = int.TryParse(
-                    val[2].Trim(),
-                    out int btn
-                );
-
-                // =====================================
-                // JOYSTICK
-                // =====================================
-
+                // --- JOYSTICK HANDLING ---
                 if (okX && okY)
                 {
-                    if (Mathf.Abs(x) < joystickSensitivity)
-                        x = 0;
-
-                    if (Mathf.Abs(y) < joystickSensitivity)
-                        y = 0;
+                    // Deadzone / Sensitivity check
+                    if (Mathf.Abs(x) < joystickSensitivity) x = 0;
+                    if (Mathf.Abs(y) < joystickSensitivity) y = 0;
 
                     horizontal = Mathf.Clamp(x * joystickMoveMultiplier, -1f, 1f);
-                    vertical   = Mathf.Clamp(y * joystickMoveMultiplier, -1f, 1f);
+                    vertical = Mathf.Clamp(y * joystickMoveMultiplier, -1f, 1f);
                 }
 
-                // =====================================
-                // BUTTON — one-shot
-                // =====================================
-
+                // --- BUTTON HANDLING ---
                 if (okButton)
                 {
                     bool currentState = (btn == 1);
 
-                    // selectPressed hanya true saat PERTAMA kali ditekan
-                    selectPressed = currentState && !lastButtonState;
+                    // Deteksi One-Shot (Hanya true di frame pertama ditekan)
+                    if (currentState && !lastButtonState)
+                    {
+                        selectPressed = true;
+                    }
 
                     selectHeld = currentState;
-
                     lastButtonState = currentState;
                 }
             }
         }
-        catch (TimeoutException)
-        {
-            // normal
-        }
         catch (Exception e)
         {
-            Debug.LogWarning("[ESP32Input] Read Error: " + e.Message);
+            // Menyembunyikan eror parsing ringan saat awal boot up ESP32
+            // Debug.LogWarning("[ESP32Input] Parse Error: " + e.Message);
         }
     }
 
-    // =========================================
-    // CLOSE SERIAL
-    // =========================================
+    // Loop ini berjalan di background, terpisah dari frame rate Unity
+    private void ReadSerialLoop()
+    {
+        while (isRunning && serialPort != null && serialPort.IsOpen)
+        {
+            try
+            {
+                string data = serialPort.ReadLine();
+                if (!string.IsNullOrEmpty(data))
+                {
+                    // Kirim data ke variabel utama menggunakan lock
+                    lock (dataLock)
+                    {
+                        latestSerialData = data.Trim().Replace("\r", "").Replace("\n", "");
+                    }
+                }
+            }
+            catch (TimeoutException)
+            {
+                // Timeout normal terjadi jika ESP32 belum mengirim data baru
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[ESP32Input] Thread Read Error: " + e.Message);
+                Thread.Sleep(10); // Istirahat sejenak jika ada error keras
+            }
+        }
+    }
+
+    private void CloseSerial()
+    {
+        isRunning = false;
+
+        if (readThread != null && readThread.IsAlive)
+        {
+            readThread.Join(100); // Tunggu thread selesai maksimal 100ms
+        }
+
+        if (serialPort != null)
+        {
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+            serialPort.Dispose();
+            serialPort = null;
+        }
+        isConnected = false;
+    }
 
     void OnApplicationQuit()
     {
-        if (serialPort != null && serialPort.IsOpen)
-            serialPort.Close();
+        CloseSerial();
+    }
+
+    void OnDisable()
+    {
+        CloseSerial();
     }
 }

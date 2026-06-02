@@ -383,17 +383,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eda928d54adcaa40ab777a53b7b1b1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelGameplayManager
+  esp32Input: {fileID: 2049245820}
   fadeCanvasGroup: {fileID: 1339462613}
   fadeDuration: 3
   popUpCanvasGroup: {fileID: 1939926038}
   timerText: {fileID: 696068086}
-  startingTime: 20
+  startingTime: 30
   timerHasStarted: 0
   audioSource: {fileID: 28775280}
   sfxTimerStart: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
   sfxTimerEnd: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
   sfxSuccessPopUp: {fileID: 8300000, guid: 9dc2d0010e8aca9488a3edb14ad6ff6d, type: 3}
   sfxSuccessConfirm: {fileID: 8300000, guid: d4036f5688cab3b45a7c8d4c8806956f, type: 3}
+  sfxSelecting: {fileID: 0}
   nextSceneName: MainMenu
   badEndingPanelObject: {fileID: 601399280}
   badEndingPopupDisplay: {fileID: 601399282}
@@ -1514,7 +1516,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1.88
+  m_PointLightOuterRadius: 5.5
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -10949,6 +10951,10 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: espInput
+      value: 
+      objectReference: {fileID: 2049245820}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
       objectReference: {fileID: 8300000, guid: 26816313565c7514aa7e77826774b3b4, type: 3}
@@ -11393,6 +11399,59 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.8163452, y: 1.1610775}
   m_EdgeRadius: 0
+--- !u!1 &2049245819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2049245821}
+  - component: {fileID: 2049245820}
+  m_Layer: 0
+  m_Name: ESP32Input
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2049245820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049245819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
+  portName: COM3
+  baudRate: 115200
+  joystickSensitivity: 0.5
+  joystickMoveMultiplier: 4
+  horizontal: 0
+  vertical: 0
+  selectPressed: 0
+  selectHeld: 0
+  isConnected: 1
+--- !u!4 &2049245821
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049245819}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.73242, y: 3.74181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2050904623
 GameObject:
   m_ObjectHideFlags: 0
@@ -11723,3 +11782,4 @@ SceneRoots:
   - {fileID: 28775279}
   - {fileID: 1705367695}
   - {fileID: 1106906291}
+  - {fileID: 2049245821}

@@ -6,8 +6,8 @@ public class CharacterSelector : MonoBehaviour
     [System.Serializable]
     public class CharacterCard
     {
-        public SpriteRenderer cardRenderer; 
-        public Sprite spriteON;    
+        public SpriteRenderer cardRenderer;
+        public Sprite spriteON;
         public Sprite spriteOFF;
         public Vector3 positionON;
         public Vector3 positionOFF;
@@ -15,9 +15,12 @@ public class CharacterSelector : MonoBehaviour
         public Vector3 scaleOFF = new Vector3(100, 100, 1);
     }
 
+    [Header("ESP32 Input Reference")]
+    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini
+
     public CharacterCard[] allCards;
-    public float fadeSpeed = 1.5f; 
-    public float appearanceDelay = 1.0f; 
+    public float fadeSpeed = 1.5f;
+    public float appearanceDelay = 1.0f;
     private int currentIndex = 0;
 
     [Header("Audio Settings")]
@@ -25,13 +28,23 @@ public class CharacterSelector : MonoBehaviour
     public AudioClip selectingSound;
     public AudioClip pressedSound;
 
+    private bool isJoystickHorizontalInUse = false;
+
     void Start()
     {
+        if (esp32Input == null)
+        {
+            esp32Input = FindFirstObjectByType<ESP32Input>();
+        }
+
         foreach (var card in allCards)
         {
-            Color c = card.cardRenderer.color;
-            c.a = 0;
-            card.cardRenderer.color = c;
+            if (card.cardRenderer != null)
+            {
+                Color c = card.cardRenderer.color;
+                c.a = 0;
+                card.cardRenderer.color = c;
+            }
         }
 
         RefreshCardDisplay();
@@ -41,16 +54,19 @@ public class CharacterSelector : MonoBehaviour
     IEnumerator FadeInCards()
     {
         yield return new WaitForSeconds(appearanceDelay);
-        
+
         float alpha = 0;
         while (alpha < 1)
         {
             alpha += Time.deltaTime * fadeSpeed;
             foreach (var card in allCards)
             {
-                Color c = card.cardRenderer.color;
-                c.a = alpha;
-                card.cardRenderer.color = c;
+                if (card.cardRenderer != null)
+                {
+                    Color c = card.cardRenderer.color;
+                    c.a = alpha;
+                    card.cardRenderer.color = c;
+                }
             }
             yield return null;
         }
@@ -58,15 +74,43 @@ public class CharacterSelector : MonoBehaviour
 
     void Update()
     {
-        // Deteksi pindah kartu
-        if (Input.GetKeyDown(KeyCode.RightArrow)) ChangeCard(1);
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) ChangeCard(-1);
+        // 1. Dapatkan input horizontal Hybrid (Keyboard & ESP32 Joystick)
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // Deteksi tekan Enter untuk pilih karakter
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (esp32Input != null && esp32Input.isConnected)
+        {
+            if (Mathf.Abs(esp32Input.horizontal) > 0.5f)
+            {
+                horizontalInput = esp32Input.horizontal;
+            }
+        }
+
+        // 2. Deteksi ketukan satu frame (Anti-Spam)
+        if (horizontalInput != 0)
+        {
+            if (!isJoystickHorizontalInUse)
+            {
+                if (horizontalInput > 0.3f) ChangeCard(1);   // Kanan
+                if (horizontalInput < -0.3f) ChangeCard(-1); // Kiri
+                isJoystickHorizontalInUse = true;
+            }
+        }
+        else
+        {
+            isJoystickHorizontalInUse = false;
+        }
+
+        // 3. Deteksi Enter/Button untuk konfirmasi karakter
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return);
+        if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
+        {
+            isConfirmPressed = true;
+        }
+
+        if (isConfirmPressed)
         {
             PlaySFX(pressedSound);
-            // Tambahkan logika buka Pop Up konfirmasi di sini
+            // Logika popup konfirmasi sudah ditangani secara paralel oleh script "Select.cs"
         }
     }
 
@@ -75,10 +119,8 @@ public class CharacterSelector : MonoBehaviour
         currentIndex += direction;
         if (currentIndex >= allCards.Length) currentIndex = 0;
         if (currentIndex < 0) currentIndex = allCards.Length - 1;
-        
-        // MAINKAN SUARA SAAT PINDAH KARTU
+
         PlaySFX(selectingSound);
-        
         RefreshCardDisplay();
     }
 
@@ -97,7 +139,6 @@ public class CharacterSelector : MonoBehaviour
         }
     }
 
-    // Fungsi bantuan untuk memutar suara
     void PlaySFX(AudioClip clip)
     {
         if (sfxSource != null && clip != null)

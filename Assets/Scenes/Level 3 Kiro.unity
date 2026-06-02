@@ -383,17 +383,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eda928d54adcaa40ab777a53b7b1b1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelGameplayManager
+  esp32Input: {fileID: 1691068003}
   fadeCanvasGroup: {fileID: 1339462613}
   fadeDuration: 3
   popUpCanvasGroup: {fileID: 1939926038}
   timerText: {fileID: 696068086}
-  startingTime: 20
+  startingTime: 30
   timerHasStarted: 0
   audioSource: {fileID: 28775280}
   sfxTimerStart: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
   sfxTimerEnd: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
   sfxSuccessPopUp: {fileID: 8300000, guid: 9dc2d0010e8aca9488a3edb14ad6ff6d, type: 3}
   sfxSuccessConfirm: {fileID: 8300000, guid: d4036f5688cab3b45a7c8d4c8806956f, type: 3}
+  sfxSelecting: {fileID: 0}
   nextSceneName: MainMenu
   badEndingPanelObject: {fileID: 601399280}
   badEndingPopupDisplay: {fileID: 601399282}
@@ -9404,6 +9406,59 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.7298012, y: 0.37221217}
   m_EdgeRadius: 0
+--- !u!1 &1691068002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1691068004}
+  - component: {fileID: 1691068003}
+  m_Layer: 0
+  m_Name: ESP32Input
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1691068003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691068002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd33c7adf5d0cc4ca2d975f27a58576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESP32Input
+  portName: COM3
+  baudRate: 115200
+  joystickSensitivity: 0.5
+  joystickMoveMultiplier: 4
+  horizontal: 0
+  vertical: 0
+  selectPressed: 0
+  selectHeld: 0
+  isConnected: 1
+--- !u!4 &1691068004
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691068002}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.73242, y: 3.74181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1705367693
 GameObject:
   m_ObjectHideFlags: 0
@@ -9903,10 +9958,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5937227061302130068, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: canMove
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: espInput
+      value: 
+      objectReference: {fileID: 1691068003}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
@@ -9991,7 +10054,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1.8
+  m_PointLightOuterRadius: 5.5
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -11645,3 +11708,4 @@ SceneRoots:
   - {fileID: 28775279}
   - {fileID: 1705367695}
   - {fileID: 1106906291}
+  - {fileID: 1691068004}

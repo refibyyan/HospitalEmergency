@@ -544,7 +544,7 @@ MonoBehaviour:
   dialogueText: {fileID: 827751956}
   dialogLines:
   - "The patient\u2019s condition is finally stabilizing."
-  - I thought I was going to lose him.
+  - I thought I was going to lose her.
   - "The tension in my chest still hasn\u2019t faded. Maybe I should sit down for
     a moment."
   typingSpeed: 0.03

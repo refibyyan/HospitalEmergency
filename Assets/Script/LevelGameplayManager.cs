@@ -80,10 +80,10 @@ public class LevelGameplayManager : MonoBehaviour
 
         DeactivateAllEndingUI();
 
-        // Otomatis mencari script ESP32Input jika lupa di-drag di Inspector
+        // FIX: Menggunakan FindAnyObjectByType untuk menghilangkan warning OBSOLETE
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
 
         if (fadeCanvasGroup != null)
@@ -116,11 +116,8 @@ public class LevelGameplayManager : MonoBehaviour
 
         if (timerText != null)
         {
-            timerText.text = string.Format(
-                "{0:00}:{1:00}",
-                Mathf.FloorToInt(startingTime / 60),
-                Mathf.FloorToInt(startingTime % 60)
-            );
+            // PERBAIKAN: Format awal diubah menjadi hanya menampilkan detik "00"
+            timerText.text = string.Format("{0:00}", Mathf.FloorToInt(startingTime));
         }
     }
 
@@ -165,9 +162,9 @@ public class LevelGameplayManager : MonoBehaviour
     {
         if (timeToDisplay < 0) timeToDisplay = 0;
 
-        int minutes = Mathf.FloorToInt(timeToDisplay / 60);
-        int seconds = Mathf.FloorToInt(timeToDisplay % 60);
-        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        // PERBAIKAN: Memotong perhitungan menit, langsung membulatkan total detik ke format "00"
+        int seconds = Mathf.FloorToInt(timeToDisplay);
+        timerText.text = string.Format("{0:00}", seconds);
     }
 
     void FreezePlayer()
@@ -188,6 +185,7 @@ public class LevelGameplayManager : MonoBehaviour
     {
         if (player != null)
         {
+            // Menggunakan linearVelocity untuk Rigidbody2D versi modern
             Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
@@ -397,6 +395,7 @@ public class LevelGameplayManager : MonoBehaviour
 
         if (popUpCanvasGroup != null) popUpCanvasGroup.alpha = 0f;
 
+        // Panggil pembekuan player
         FreezePlayerDynamic(playerObject);
         StartCoroutine(GoodEndingRoutine());
     }

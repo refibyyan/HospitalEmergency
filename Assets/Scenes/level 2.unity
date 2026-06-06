@@ -6733,7 +6733,17 @@ MonoBehaviour:
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Doctor
-    dialogueText: 'We need your help! We must save the patient! '
+    dialogueText: We need someone to restore the electricity immediately!
+    textSpeed: 0.04
+    textDelay: 1.4
+    dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
+  - playerName: Kiro
+    dialogueText: Restore the power?
+    textSpeed: 0.04
+    textDelay: 1.4
+    dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
+  - playerName: Kiro
+    dialogueText: 'There should be a control panel nearby '
     textSpeed: 0.04
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
@@ -10710,6 +10720,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155d76c31cbef2e47ac7c7d84c9c66a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  esp32Input: {fileID: 0}
   fadeImage: {fileID: 1987053894}
   fadeDuration: 3
   dialogueBox: {fileID: 1231065540}
@@ -10717,9 +10728,7 @@ MonoBehaviour:
   playerNameTMP: {fileID: 82749818}
   introDialogues:
   - playerName: Kiro
-    dialogueText: '
-
-      Now that the adrenaline is fading... I can barely breathe... '
+    dialogueText: 'Now that the adrenaline is fading... I can barely breathe... '
     textSpeed: 0.04
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}

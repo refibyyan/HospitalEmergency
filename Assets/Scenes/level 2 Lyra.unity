@@ -6675,7 +6675,17 @@ MonoBehaviour:
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   - playerName: Doctor
-    dialogueText: 'We need your help! We must save the patient! '
+    dialogueText: We need someone to restore the electricity immediately!
+    textSpeed: 0.04
+    textDelay: 1.4
+    dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
+  - playerName: Lyra
+    dialogueText: Restore the power?
+    textSpeed: 0.04
+    textDelay: 1.4
+    dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
+  - playerName: Lyra
+    dialogueText: There should be a control panel nearby
     textSpeed: 0.04
     textDelay: 1.4
     dialogueSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}

@@ -40,30 +40,43 @@ public class Select : MonoBehaviour
     private string activeCharacter = "";
 
     // Kunci Anti-Spam Joystick
-    private bool isJoystickHorizontalInUse = false;
     private bool isJoystickVerticalInUse = false;
 
     void Start()
     {
         if (kiroButton != null) kiroButton.Select();
 
+        // FIX BARIS 52: Menggunakan FindAnyObjectByType untuk menghilangkan warning OBSOLETE
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
     }
 
     void Update()
     {
         // -----------------------------------------------------------------
+        // SINKRONISASI TOTAL: Ambil langsung dari indeks CharacterSelector
+        // -----------------------------------------------------------------
+        if (!isPopUpActive)
+        {
+            if (CharacterSelector.publicCurrentIndex == 0)
+            {
+                activeCharacter = "Kiro";
+            }
+            else
+            {
+                activeCharacter = "Lyra";
+            }
+        }
+
+        // -----------------------------------------------------------------
         // AMBIL INPUT HYBRID (KEYBOARD & ESP32)
         // -----------------------------------------------------------------
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
 
         if (esp32Input != null && esp32Input.isConnected)
         {
-            if (Mathf.Abs(esp32Input.horizontal) > 0.5f) horizontalInput = esp32Input.horizontal;
             if (Mathf.Abs(esp32Input.vertical) > 0.5f) verticalInput = esp32Input.vertical;
         }
 
@@ -74,27 +87,10 @@ public class Select : MonoBehaviour
         }
 
         // -----------------------------------------------------------------
-        // PROSES ONE-SHOT NAVIGASI
+        // PROSES ONE-SHOT NAVIGASI POP-UP (VERTIKAL)
         // -----------------------------------------------------------------
-        bool navigateLeft = false;
-        bool navigateRight = false;
         bool navigateUp = false;
         bool navigateDown = false;
-
-        // Cek Horizontal
-        if (horizontalInput != 0)
-        {
-            if (!isJoystickHorizontalInUse)
-            {
-                if (horizontalInput < -0.3f) navigateLeft = true;
-                if (horizontalInput > 0.3f) navigateRight = true;
-                isJoystickHorizontalInUse = true;
-            }
-        }
-        else
-        {
-            isJoystickHorizontalInUse = false;
-        }
 
         // Cek Vertikal
         if (verticalInput != 0)
@@ -111,38 +107,25 @@ public class Select : MonoBehaviour
             isJoystickVerticalInUse = false;
         }
 
-        // Tambahan input tombol keyboard cadangan (A/D & W/S)
-        if (Input.GetKeyDown(KeyCode.A)) navigateLeft = true;
-        if (Input.GetKeyDown(KeyCode.D)) navigateRight = true;
+        // Tambahan input tombol keyboard cadangan (W/S)
         if (Input.GetKeyDown(KeyCode.W)) navigateUp = true;
         if (Input.GetKeyDown(KeyCode.S)) navigateDown = true;
 
         // -----------------------------------------------------------------
-        // LOGIKA SELEKSI KARAKTER & POP-UP
+        // LOGIKA SELEKSI POP-UP
         // -----------------------------------------------------------------
         if (!isPopUpActive)
         {
-            // Navigasi Utama Kiri / Kanan (Looping & Menyambung Sempurna)
-            if (navigateLeft || navigateRight)
-            {
-                PlaySFX(selectingSound);
-                NavigateMainSelection(navigateLeft);
-            }
-
             if (isConfirmPressed)
             {
-                GameObject current = EventSystem.current.currentSelectedGameObject;
-
-                // Memastikan pengecekan berdasarkan tombol yang saat ini AKTIF di-highlight secara presisi
-                if (current == kiroButton.gameObject)
+                // Eksekusi pop-up berdasarkan data statis yang 100% valid dan anti-tertukar
+                if (activeCharacter == "Kiro")
                 {
-                    activeCharacter = "Kiro";
                     PlaySFX(pressedSound);
                     OpenPopUp(kiroPopUpObj);
                 }
-                else if (current == lyraButton.gameObject)
+                else if (activeCharacter == "Lyra")
                 {
-                    activeCharacter = "Lyra";
                     PlaySFX(pressedSound);
                     OpenPopUp(lyraPopUpObj);
                 }
@@ -171,43 +154,6 @@ public class Select : MonoBehaviour
                 {
                     CloseAll();
                 }
-            }
-        }
-    }
-
-    // Mengurus paksa focus UI Button secara looping melingkar tanpa putus
-    private void NavigateMainSelection(bool left)
-    {
-        GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
-
-        if (currentSelected == null)
-        {
-            kiroButton.Select();
-            return;
-        }
-
-        if (left)
-        {
-            // Jika di Kiro (paling kiri) dipaksa geser kiri, dia akan melompat secara mulus ke Lyra (paling kanan)
-            if (currentSelected == kiroButton.gameObject)
-            {
-                lyraButton.Select();
-            }
-            else if (currentSelected == lyraButton.gameObject)
-            {
-                kiroButton.Select();
-            }
-        }
-        else // Right
-        {
-            // Jika di Lyra (paling kanan) dipaksa geser kanan, dia akan berputar kembali ke Kiro (paling kiri)
-            if (currentSelected == lyraButton.gameObject)
-            {
-                kiroButton.Select();
-            }
-            else if (currentSelected == kiroButton.gameObject)
-            {
-                lyraButton.Select();
             }
         }
     }
@@ -251,6 +197,7 @@ public class Select : MonoBehaviour
         lyraPopUpObj.SetActive(false);
         if (blurPanel != null) blurPanel.SetActive(false);
 
+        // Fokus dikembalikan pasif mengikuti karakter aktif saat ini
         if (activeCharacter == "Kiro") kiroButton.Select();
         else lyraButton.Select();
     }

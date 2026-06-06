@@ -23,6 +23,9 @@ public class CharacterSelector : MonoBehaviour
     public float appearanceDelay = 1.0f;
     private int currentIndex = 0;
 
+    // VARIABEL STATIS: Agar skrip Select.cs tahu kartu mana yang aktif (0 = Kiro, 1 = Lyra)
+    public static int publicCurrentIndex = 0;
+
     [Header("Audio Settings")]
     public AudioSource sfxSource;
     public AudioClip selectingSound;
@@ -32,9 +35,10 @@ public class CharacterSelector : MonoBehaviour
 
     void Start()
     {
+        // FIX: Menggunakan FindAnyObjectByType untuk menghilangkan warning OBSOLETE
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
 
         foreach (var card in allCards)
@@ -46,6 +50,10 @@ public class CharacterSelector : MonoBehaviour
                 card.cardRenderer.color = c;
             }
         }
+
+        // Ambil urutan default dari statis pilihan karakter jika ada atau default ke Kiro (0)
+        currentIndex = (Select.selectedCharacter == "Lyra") ? 1 : 0;
+        publicCurrentIndex = currentIndex;
 
         RefreshCardDisplay();
         StartCoroutine(FadeInCards());
@@ -74,7 +82,7 @@ public class CharacterSelector : MonoBehaviour
 
     void Update()
     {
-        // 1. Dapatkan input horizontal Hybrid (Keyboard & ESP32 Joystick)
+        // Hubungkan input horizontal Hybrid (Keyboard & ESP32 Joystick)
         float horizontalInput = Input.GetAxisRaw("Horizontal");
 
         if (esp32Input != null && esp32Input.isConnected)
@@ -85,7 +93,6 @@ public class CharacterSelector : MonoBehaviour
             }
         }
 
-        // 2. Deteksi ketukan satu frame (Anti-Spam)
         if (horizontalInput != 0)
         {
             if (!isJoystickHorizontalInUse)
@@ -97,11 +104,17 @@ public class CharacterSelector : MonoBehaviour
         }
         else
         {
-            isJoystickHorizontalInUse = false;
+            // Tambahan input tombol keyboard cadangan (A/D)
+            if (Input.GetKeyDown(KeyCode.A)) { ChangeCard(-1); isJoystickHorizontalInUse = true; }
+            else if (Input.GetKeyDown(KeyCode.D)) { ChangeCard(1); isJoystickHorizontalInUse = true; }
+            else
+            {
+                isJoystickHorizontalInUse = false;
+            }
         }
 
-        // 3. Deteksi Enter/Button untuk konfirmasi karakter
-        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return);
+        // Deteksi Enter/Button hanya untuk play sound efek tekan
+        bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
         if (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed)
         {
             isConfirmPressed = true;
@@ -110,7 +123,6 @@ public class CharacterSelector : MonoBehaviour
         if (isConfirmPressed)
         {
             PlaySFX(pressedSound);
-            // Logika popup konfirmasi sudah ditangani secara paralel oleh script "Select.cs"
         }
     }
 
@@ -119,6 +131,9 @@ public class CharacterSelector : MonoBehaviour
         currentIndex += direction;
         if (currentIndex >= allCards.Length) currentIndex = 0;
         if (currentIndex < 0) currentIndex = allCards.Length - 1;
+
+        // Perbarui data statis agar bisa langsung dibaca oleh Select.cs tanpa delay
+        publicCurrentIndex = currentIndex;
 
         PlaySFX(selectingSound);
         RefreshCardDisplay();

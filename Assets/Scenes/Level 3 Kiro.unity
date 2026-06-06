@@ -4067,8 +4067,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4078047891
-  m_fontColor: {r: 0.5773585, g: 0.06862938, b: 0.06862938, a: 0.9529412}
+    rgba: 4080414380
+  m_fontColor: {r: 0.6745098, g: 0.18039216, b: 0.21176471, a: 0.9529412}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4085,8 +4085,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 80
+  m_fontSizeBase: 80
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -11778,7 +11778,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.11775923, y: 1.202672}
+  m_Offset: {x: -0.072996795, y: 1.202672}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -11788,7 +11788,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 4.7753153, y: 2.0380363}
+  m_Size: {x: 2.3128328, y: 2.0380363}
   m_EdgeRadius: 0
 --- !u!82 &2101696677
 AudioSource:

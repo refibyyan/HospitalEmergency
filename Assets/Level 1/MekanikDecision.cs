@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using TMP_Text = TMPro.TMP_Text;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class MekanikDecision : MonoBehaviour
 {
     [Header("--- ESP32 INPUT REFERENCE ---")]
-    public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
+    public ESP32Input esp32Input; 
+
+    [Header("--- CUTSCENE REFERENCE ---")]
+    public CutsceneTyping cutsceneManager;
 
     [Header("Object UI Decision")]
+    [Tooltip("Drag objek kosong pembungkus kartu & timer ke sini (bukan win panel/fade image)")]
+    public GameObject kontenDecisionPanel; 
     public Image cardKiriUI;
     public Image cardKananUI;
 
@@ -35,6 +41,10 @@ public class MekanikDecision : MonoBehaviour
     [Header("Popup")]
     public GameObject winPanel;
     public GameObject gameOverPanel;
+
+    [Header("Fade Background Effect")]
+    [Tooltip("Drag UI FadeImage yang punya komponen CanvasGroup ke sini")]
+    public CanvasGroup fadeImageCanvasGroup; 
 
     [Header("Button Win")]
     public Button proceedButton;
@@ -70,7 +80,6 @@ public class MekanikDecision : MonoBehaviour
     public AudioSource monitorSource;
     public AudioClip monitorJantung;
 
-    // Tracker State internal untuk simulasi GetKeyDown (Mencegah spam menu/card)
     private bool espLeftHoldLastFrame = false;
     private bool espRightHoldLastFrame = false;
     private bool espLeftThumbPressed = false;
@@ -92,11 +101,24 @@ public class MekanikDecision : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        if (barMerahTimer != null)
-            barMerahTimer.fillAmount = 1f;
+        if (fadeImageCanvasGroup != null)
+        {
+            fadeImageCanvasGroup.gameObject.SetActive(true);
+            
+            // 🛡️ PROTEKSI OTOMATIS: Ambil komponen Image dan paksa warnanya jadi Hitam Pekat (Alpha 255)
+            Image imgKomponen = fadeImageCanvasGroup.GetComponent<Image>();
+            if (imgKomponen != null)
+            {
+                imgKomponen.color = new Color(0f, 0f, 0f, 1f); // Mencegah Alpha Image bernilai 0 di Inspector
+            }
+
+            // Atur transparansi utama lewat CanvasGroup (set ke 0 dulu biar tidak nutupin gameplay awal)
+            fadeImageCanvasGroup.alpha = 0f;
+            fadeImageCanvasGroup.blocksRaycasts = false; 
+        }
 
         if (proceedButton != null)
-            proceedButton.onClick.AddListener(LanjutLevel2);
+            proceedButton.onClick.AddListener(LanjutKeCutscene);
 
         if (restartButton != null)
         {
@@ -125,10 +147,14 @@ public class MekanikDecision : MonoBehaviour
             timerSource.Play();
         }
 
-        // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
+        }
+
+        if (cutsceneManager == null)
+        {
+            cutsceneManager = FindAnyObjectByType<CutsceneTyping>();
         }
 
         UpdatePilihanCard();
@@ -137,7 +163,6 @@ public class MekanikDecision : MonoBehaviour
 
     void Update()
     {
-        // Jalankan pemrosesan threshold joystick & WASD secara hybrid
         HandleESP32JoystickThresholds();
 
         if (isGameOverActive)
@@ -179,7 +204,6 @@ public class MekanikDecision : MonoBehaviour
 
     void InputPilihan()
     {
-        // Input KIRI Hybrid
         if (espLeftThumbPressed)
         {
             pilihKiri = true;
@@ -189,7 +213,6 @@ public class MekanikDecision : MonoBehaviour
                 audioSource.PlayOneShot(chooseClick);
         }
 
-        // Input KANAN Hybrid
         if (espRightThumbPressed)
         {
             pilihKiri = false;
@@ -199,7 +222,6 @@ public class MekanikDecision : MonoBehaviour
                 audioSource.PlayOneShot(chooseClick);
         }
 
-        // Input KONFIRMASI Hybrid
         bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
                                 Input.GetKeyDown(KeyCode.Space) ||
                                 (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
@@ -215,7 +237,6 @@ public class MekanikDecision : MonoBehaviour
 
     void UpdatePilihanCard()
     {
-        // FIX: Sekarang visual card kanan/kiri berubah dinamis mengikuti nilai boolean 'pilihKiri'
         if (pilihKiri)
         {
             if (cardKiriUI != null) cardKiriUI.sprite = gambarKiriIjo;
@@ -223,21 +244,27 @@ public class MekanikDecision : MonoBehaviour
         }
         else
         {
-            if (cardKiriUI != null) cardKiriUI.sprite = gambarKiriPolos;
             if (cardKananUI != null) cardKananUI.sprite = gambarKananIjo;
+            if (cardKiriUI != null) cardKiriUI.sprite = gambarKiriPolos;
         }
     }
 
     public void Menang()
     {
         if (gameSelesai) return;
-
         gameSelesai = true;
 
         if (audioSource != null && berhasilLevel != null)
             audioSource.PlayOneShot(berhasilLevel);
 
-        Debug.Log("MENANG!");
+        Debug.Log("MENANG! Membuka Win Panel & Set Latar Belakang Hitam.");
+
+        // Langsung paksa CanvasGroup naik ke Alpha 240 (0.94f)
+        if (fadeImageCanvasGroup != null)
+        {
+            fadeImageCanvasGroup.blocksRaycasts = true;
+            fadeImageCanvasGroup.alpha = 0.94f; 
+        }
 
         if (winPanel != null)
             winPanel.SetActive(true);
@@ -245,13 +272,34 @@ public class MekanikDecision : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    void LanjutLevel2()
+    void LanjutKeCutscene()
     {
         if (audioSource != null && chooseClick != null)
             audioSource.PlayOneShot(chooseClick);
 
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("Loading 1 to 2");
+        if (winPanel != null)
+            winPanel.SetActive(false); 
+
+        if (kontenDecisionPanel != null)
+        {
+            kontenDecisionPanel.SetActive(false);
+        }
+        else
+        {
+            if (cardKiriUI != null) cardKiriUI.gameObject.SetActive(false);
+            if (cardKananUI != null) cardKananUI.gameObject.SetActive(false);
+            if (barMerahTimer != null) barMerahTimer.transform.parent.gameObject.SetActive(false);
+        }
+
+        if (cutsceneManager != null)
+        {
+            cutsceneManager.PlayCutscene(null);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("Loading 1 to 2");
+        }
     }
 
     void HandleWinPanelInput()
@@ -262,21 +310,17 @@ public class MekanikDecision : MonoBehaviour
 
         if (isConfirmPressed && winPanel != null && winPanel.activeSelf)
         {
-            LanjutLevel2();
+            LanjutKeCutscene();
         }
     }
 
     void TriggerGameOver()
     {
         if (isGameOverActive) return;
-
         isGameOverActive = true;
 
-        if (timerSource != null)
-            timerSource.Stop();
-
-        if (monitorSource != null)
-            monitorSource.Stop();
+        if (timerSource != null) timerSource.Stop();
+        if (monitorSource != null) monitorSource.Stop();
 
         if (gameOverSource != null && hentiJantungSFX != null)
         {
@@ -285,11 +329,17 @@ public class MekanikDecision : MonoBehaviour
 
         Debug.Log("GAME OVER!");
 
-        Time.timeScale = 0f;
+        // Langsung paksa CanvasGroup naik ke Alpha 240 (0.94f)
+        if (fadeImageCanvasGroup != null)
+        {
+            fadeImageCanvasGroup.blocksRaycasts = true;
+            fadeImageCanvasGroup.alpha = 0.94f; 
+        }
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
+        Time.timeScale = 0f;
         UpdateGameOverButton();
     }
 
@@ -365,15 +415,11 @@ public class MekanikDecision : MonoBehaviour
         espLeftThumbPressed = false;
         espRightThumbPressed = false;
 
-        // 1. Ambil input keyboard/WASD standar Unity
         float horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        // 2. Ambil nilai joystick dari script ESP32Input
         float espHorizontal = 0f;
+
         if (esp32Input != null && esp32Input.isConnected)
         {
-            // 💡 FIX: Menggunakan refleksi otomatis untuk mendeteksi variabel joystick apa pun di ESP32Input.cs Anda
-            // (Mencari otomatis jika namanya: horizontalValue, joystickX, atau horizontal)
             var type = esp32Input.GetType();
             var fieldHorizontal = type.GetField("horizontalValue") ?? type.GetField("joystickX") ?? type.GetField("horizontal");
 
@@ -383,16 +429,13 @@ public class MekanikDecision : MonoBehaviour
             }
             else
             {
-                // Jika sistem otomatis tidak mendeteksi nama variabel di script Anda, ganti manual baris di bawah ini:
                 espHorizontal = horizontalInput;
             }
         }
 
-        // 3. Gabungkan deteksi mentah (Raw Input)
         bool leftRaw = (horizontalInput < -0.5f) || (espHorizontal < -0.5f) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
         bool rightRaw = (horizontalInput > 0.5f) || (espHorizontal > 0.5f) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
 
-        // --- Edge-Detection (Anti-Spam / Simulasi GetKeyDown) ---
         if (leftRaw)
         {
             if (!espLeftHoldLastFrame)

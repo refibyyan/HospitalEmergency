@@ -3,13 +3,11 @@
 public class TriggerDecisionLv1 : MonoBehaviour
 {
     [Header("UI Decision")]
+    [Tooltip("Drag GameObject yang memegang script MekanikDecision atau Panel Decision ke sini")]
     public GameObject decisionPanel;
 
     [Header("Dialogue awal")]
     public GameObject dialogueBox;
-
-    [Header("Cutscene")]
-    public CutsceneTyping cutscene;
 
     [Header("Player Movement")]
     public MonoBehaviour playerMovement; // drag script movement
@@ -18,7 +16,6 @@ public class TriggerDecisionLv1 : MonoBehaviour
     public Rigidbody2D playerRb; // 👉 drag Rigidbody Player ke sini
 
     private bool sudahTrigger = false;
-    private bool panelAktif = false;
 
     void Start()
     {
@@ -34,28 +31,27 @@ public class TriggerDecisionLv1 : MonoBehaviour
         {
             sudahTrigger = true;
 
-            // Matikan dialogue
+            // Matikan dialogue box awal jika masih ada yang aktif
             if (dialogueBox != null)
                 dialogueBox.SetActive(false);
 
             // 🔥 FREEZE TOTAL PLAYER
-
             // 1. Disable script movement
             if (playerMovement != null)
                 playerMovement.enabled = false;
 
-            // 2. Stop velocity
+            // 2. Stop velocity via Collider component
             Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
                 rb.angularVelocity = 0f;
 
-                // 3. Ubah jadi STATIC (INI YANG PALING PENTING)
+                // 3. Ubah jadi STATIC (Agar tidak terpengaruh physics/gravitasi saat memilih)
                 rb.bodyType = RigidbodyType2D.Static;
             }
 
-            // (backup kalau kamu drag manual)
+            // (backup kalau kamu drag manual di Inspector)
             if (playerRb != null)
             {
                 playerRb.linearVelocity = Vector2.zero;
@@ -63,27 +59,34 @@ public class TriggerDecisionLv1 : MonoBehaviour
                 playerRb.bodyType = RigidbodyType2D.Static;
             }
 
-            // ▶️ Cutscene
-            if (cutscene != null)
-                cutscene.PlayCutscene(this);
+            // ▶️ ALUR BARU: Langsung panggil panel decision di sini saat nabrak trigger
+            MulaiMekanikDecision();
         }
     }
 
-    public void ShowDecision()
+    // Mengaktifkan panel decision/pilihan di awal flow
+    public void MulaiMekanikDecision()
     {
         if (decisionPanel == null) return;
 
         decisionPanel.SetActive(true);
-        panelAktif = true;
+        
+        // Mengambil script MekanikDecision secara otomatis jika menempel di game object yang sama
+        MekanikDecision mekanik = decisionPanel.GetComponent<MekanikDecision>();
+        if (mekanik != null)
+        {
+            // Pastikan timeScale diatur normal di awal mekanik agar input joystick/keyboard terbaca
+            Time.timeScale = 1f; 
+        }
     }
 
+    // Fungsi ini bisa dipanggil jika kamu membutuhkan reset player ke kondisi normal di luar alur Menang/Pindah Scene
     public void EksekusiPilihan()
     {
         if (decisionPanel != null)
             decisionPanel.SetActive(false);
 
         // 🔥 BALIKIN PLAYER
-
         // enable movement lagi
         if (playerMovement != null)
             playerMovement.enabled = true;

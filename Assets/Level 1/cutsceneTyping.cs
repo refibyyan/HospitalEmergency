@@ -2,6 +2,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Diperlukan untuk pindah scene di akhir cutscene
 
 public class CutsceneTyping : MonoBehaviour
 {
@@ -32,10 +33,10 @@ public class CutsceneTyping : MonoBehaviour
 
     void Start()
     {
-        // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
+        // FIX: Menggunakan FindAnyObjectByType agar terhindar dari warning obsolete
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
 
         if (cutscenePanel != null)
@@ -64,8 +65,9 @@ public class CutsceneTyping : MonoBehaviour
     {
         if (cutscenePanel == null || !cutscenePanel.activeSelf) return;
 
-        // 🔥 DETEKSI INPUT HYBRID (Keyboard Enter OR Tombol Select Hardware ESP32)
+        // DETEKSI INPUT HYBRID (Keyboard Enter OR Tombol Select Hardware ESP32)
         bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
+                                Input.GetKeyDown(KeyCode.Space) ||
                                 (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
 
         if (isConfirmPressed)
@@ -111,7 +113,8 @@ public class CutsceneTyping : MonoBehaviour
         foreach (char c in dialogLines[indexDialog])
         {
             dialogueText.text += c;
-            yield return new WaitForSeconds(typingSpeed);
+            // FIX: Menggunakan WaitForSecondsRealtime agar teks tetap mengetik walaupun Time.timeScale = 0f
+            yield return new WaitForSecondsRealtime(typingSpeed);
         }
 
         if (typingSource != null)
@@ -150,10 +153,14 @@ public class CutsceneTyping : MonoBehaviour
     {
         yield return StartCoroutine(FadeOut());
         cutscenePanel.SetActive(false);
-        if (trigger != null)
-        {
-            trigger.ShowDecision();
-        }
+        
+        // PENTING: Mengembalikan waktu dunia game menjadi normal sebelum pindah scene
+        Time.timeScale = 1f;
+
+        // Alur Baru: Selesai cutscene langsung pindah ke Loading Level 2 sesuai urutan request kamu
+        SceneManager.LoadScene("Loading 1 to 2");
+
+        // FIX: Baris error 'trigger.ShowDecision()' dihapus karena alur scene sudah selesai dan langsung berpindah scene.
     }
 
     // ================= FADE =================
@@ -162,7 +169,8 @@ public class CutsceneTyping : MonoBehaviour
         float t = 1f;
         while (t > 0f)
         {
-            t -= Time.deltaTime * fadeSpeed;
+            // Menggunakan unscaledDeltaTime agar transisi fade aman dari pembekuan waktu
+            t -= Time.unscaledDeltaTime * fadeSpeed;
             SetFade(t);
             yield return null;
         }
@@ -174,7 +182,7 @@ public class CutsceneTyping : MonoBehaviour
         float t = 0f;
         while (t < 1f)
         {
-            t += Time.deltaTime * fadeSpeed;
+            t += Time.unscaledDeltaTime * fadeSpeed;
             SetFade(t);
             yield return null;
         }

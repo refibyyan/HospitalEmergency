@@ -74,6 +74,7 @@ public class QuickDecisionManager : MonoBehaviour
     public AudioClip selectSFX;
     public AudioClip confirmSFX;
     public AudioClip timerSFX;
+    public AudioClip sfx_Berhasil; // ✨ Slot baru untuk menaruh Audio sfx_Berhasil di Inspector
 
     [Header("MISSION TIMER AUDIO")]
     public AudioSource missionTimerAudioSource;
@@ -115,6 +116,12 @@ public class QuickDecisionManager : MonoBehaviour
         if (popupObjGenerator != null) popupObjGenerator.SetActive(false);
         if (timerTemplate != null) timerTemplate.SetActive(false);
         if (triggerDecision != null) triggerDecision.SetActive(false);
+
+        // Otomatis bersihkan warning obsolete untuk pencarian ESP32 jika lupa di-drag
+        if (esp32Input == null)
+        {
+            esp32Input = FindAnyObjectByType<ESP32Input>();
+        }
 
         UpdateChoiceVisual();
         UpdatePopupVisual();
@@ -448,7 +455,11 @@ public class QuickDecisionManager : MonoBehaviour
 
         if (currentPopupType == 2)
         {
-            if (continueButton2 != null) continueButton2.sprite = continueON;
+            if (continueButton2 != null) 
+            {
+                continueButton2.sprite = continueON;
+                PlaySFX(sfx_Berhasil); // 🔥 Memutar sfx_Berhasil tepat ketika tombol continue aktif (ON)
+            }
         }
 
         if (currentPopupType == 3)

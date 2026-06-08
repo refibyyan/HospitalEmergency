@@ -549,7 +549,7 @@ MonoBehaviour:
     a moment."
   typingSpeed: 0.03
   typingSource: {fileID: 52907501}
-  typingSFX: {fileID: 8300000, guid: 32508ae56b8142b44ad6a6aee8d5da97, type: 3}
+  typingSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   fadeImage: {fileID: 1140292152}
   fadeSpeed: 1
 --- !u!4 &52907500
@@ -6472,12 +6472,15 @@ MonoBehaviour:
   textMeshPro: {fileID: 911948278}
   typingSpeed: 0.07
   typingSource: {fileID: 1095340351}
-  typingSFX: {fileID: 8300000, guid: 53e7352c7b23cf2478ce6c62832559af, type: 3}
+  typingSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   startDelay: 0
   dialogLines:
   - I... where am I?
   - "Why\u2026 does my head hurt\u2026"
   - I have to find out...
+  - Who is she?
+  - 'Something seems wrong with this patient '
+  - I should help her quickly
 --- !u!4 &1095340350
 Transform:
   m_ObjectHideFlags: 0

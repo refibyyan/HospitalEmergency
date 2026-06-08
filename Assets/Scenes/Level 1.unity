@@ -549,7 +549,7 @@ MonoBehaviour:
     a moment."
   typingSpeed: 0.03
   typingSource: {fileID: 52907501}
-  typingSFX: {fileID: 8300000, guid: 32508ae56b8142b44ad6a6aee8d5da97, type: 3}
+  typingSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   fadeImage: {fileID: 279959861}
   fadeSpeed: 1
 --- !u!4 &52907500
@@ -845,7 +845,7 @@ MonoBehaviour:
   cardKananUI: {fileID: 1708617941}
   audioSource: {fileID: 75671538}
   chooseClick: {fileID: 8300000, guid: d87d6a4e0e70c6747a1e953dbfd1af37, type: 3}
-  berhasilLevel: {fileID: 8300000, guid: 7ca09b1e27238564f9cbcc0ab6cfb087, type: 3}
+  berhasilLevel: {fileID: 8300000, guid: 9dc2d0010e8aca9488a3edb14ad6ff6d, type: 3}
   gambarKiriIjo: {fileID: -8795594310455231853, guid: b3807c0d2989a434eb02baba7c52a617, type: 3}
   gambarKiriPolos: {fileID: -3424827064934156760, guid: 2a779edbeb34d7f40a8362c544392ef0, type: 3}
   gambarKananIjo: {fileID: -366575602748004827, guid: 0b63892fab864ce40ba2e89863478f63, type: 3}
@@ -856,7 +856,6 @@ MonoBehaviour:
   winPanel: {fileID: 790272435}
   gameOverPanel: {fileID: 74958326}
   fadeImageCanvasGroup: {fileID: 279959862}
-  durasiFade: 0.5
   proceedButton: {fileID: 859751782}
   buttonRestartUI: {fileID: 1007620415}
   buttonExitUI: {fileID: 2118696983}
@@ -6528,12 +6527,15 @@ MonoBehaviour:
   textMeshPro: {fileID: 911948278}
   typingSpeed: 0.07
   typingSource: {fileID: 1095340351}
-  typingSFX: {fileID: 8300000, guid: 53e7352c7b23cf2478ce6c62832559af, type: 3}
+  typingSFX: {fileID: 8300000, guid: bdb9a52f3bf884943a34f2a62e8c0449, type: 3}
   startDelay: 0
   dialogLines:
   - I... where am I?
   - "Why\u2026 does my head hurt\u2026"
   - I have to find out...
+  - Whos is she?
+  - 'Something seems wrong with this patient '
+  - I should help her quickly
 --- !u!4 &1095340350
 Transform:
   m_ObjectHideFlags: 0

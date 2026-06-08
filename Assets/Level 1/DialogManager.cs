@@ -32,7 +32,8 @@ public class DialogManager : MonoBehaviour
         // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            // Diubah ke FindAnyObjectByType untuk menghindari warning obsolete
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
 
         StartCoroutine(WaitBeforeStart());
@@ -60,27 +61,29 @@ public class DialogManager : MonoBehaviour
     {
         textMeshPro.text = "";
 
+        // 🔥 Mulai mainkan SFX secara looping selama text sedang mengetik
+        if (typingSource != null && typingSFX != null)
+        {
+            typingSource.clip = typingSFX;
+            typingSource.loop = true; // Set audio agar mengulang terus selama text jalan
+            typingSource.Play();
+        }
+
         foreach (char c in dialogLines[index].ToCharArray())
         {
             textMeshPro.text += c;
-
-            if (typingSource != null &&
-                typingSFX != null &&
-                c != ' ' &&
-                !typingSource.isPlaying)
-            {
-                typingSource.PlayOneShot(typingSFX);
-            }
-
             yield return new WaitForSeconds(typingSpeed);
         }
+
+        // 🔥 Matikan SFX tepat setelah text selesai beranimasi secara natural
+        StopTypingSFX();
     }
 
     void Update()
     {
         if (!isDialogActive) return;
 
-        // 🔥 DETEKSI INPUT HYBRID (Keyboard Enter OR Mouse Click OR ESP32 Select Button)
+        // DETEKSI INPUT HYBRID (Keyboard Enter OR Mouse Click OR ESP32 Select Button)
         bool isConfirmPressed = Input.GetKeyDown(KeyCode.Return) ||
                                 Input.GetMouseButtonDown(0) ||
                                 (esp32Input != null && esp32Input.isConnected && esp32Input.selectPressed);
@@ -101,11 +104,9 @@ public class DialogManager : MonoBehaviour
                 }
 
                 textMeshPro.text = dialogLines[index];
-
-                if (typingSource != null)
-                {
-                    typingSource.Stop();
-                }
+                
+                // 🔥 Matikan SFX langsung karena dialog di-skip oleh player
+                StopTypingSFX();
             }
         }
     }
@@ -115,26 +116,27 @@ public class DialogManager : MonoBehaviour
         if (index < dialogLines.Length - 1)
         {
             index++;
-
-            if (typingSource != null)
-            {
-                typingSource.Stop();
-            }
-
+            StopTypingSFX();
             typingCoroutine = StartCoroutine(TypeLine());
         }
         else
         {
-            if (typingSource != null)
-            {
-                typingSource.Stop();
-            }
+            StopTypingSFX();
 
             if (dialogBox != null) dialogBox.SetActive(false);
             textMeshPro.text = "";
             isDialogActive = false;
 
             Debug.Log("Dialog Selesai! Pemain sekarang bisa jalan.");
+        }
+    }
+
+    // 🔥 Fungsi pembantu untuk mematikan SFX typing dengan aman
+    void StopTypingSFX()
+    {
+        if (typingSource != null && typingSource.isPlaying)
+        {
+            typingSource.Stop();
         }
     }
 }

@@ -388,7 +388,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 0ccbabfcc8922cd40acf5cdd53a86877, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ec8058e45af87c8418dfd731c60b5540, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -427,9 +427,9 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 21300000, guid: 8bb48d571be267a4589a91a3adb543b4, type: 3}
-    m_PressedSprite: {fileID: 21300000, guid: 8bb48d571be267a4589a91a3adb543b4, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 21300000, guid: 2aab0e39c8078b54cbfdf0bf14def0ff, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 2aab0e39c8078b54cbfdf0bf14def0ff, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: 2aab0e39c8078b54cbfdf0bf14def0ff, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -504,8 +504,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 40, y: -452.7}
-  m_SizeDelta: {x: 570.7385, y: 23.3471}
+  m_AnchoredPosition: {x: 27.7, y: -452.7}
+  m_SizeDelta: {x: 616.7092, y: 23.3471}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &513046946
 MonoBehaviour:
@@ -574,8 +574,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -852,8 +852,8 @@ MonoBehaviour:
     scaleON: {x: 100, y: 100, z: 1}
     scaleOFF: {x: 100, y: 100, z: 1}
   - cardRenderer: {fileID: 493658022}
-    spriteON: {fileID: 21300000, guid: 8bb48d571be267a4589a91a3adb543b4, type: 3}
-    spriteOFF: {fileID: 21300000, guid: 0ccbabfcc8922cd40acf5cdd53a86877, type: 3}
+    spriteON: {fileID: 21300000, guid: 2aab0e39c8078b54cbfdf0bf14def0ff, type: 3}
+    spriteOFF: {fileID: 21300000, guid: ec8058e45af87c8418dfd731c60b5540, type: 3}
     positionON: {x: 493, y: -50, z: 0}
     positionOFF: {x: 520, y: -50, z: 0}
     scaleON: {x: 100, y: 100, z: 1}
@@ -1027,8 +1027,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 38.4, y: 321.62}
-  m_SizeDelta: {x: 536.8167, y: 50}
+  m_AnchoredPosition: {x: 38.4, y: 331.05}
+  m_SizeDelta: {x: 536.8167, y: 62.11}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1000700948
 MonoBehaviour:
@@ -1070,7 +1070,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Each character has a different story. Your Choices determine their fate. '
+  m_text: 'Choose your character
+
+    and begin the journey'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bfa6fe600222ac84a9edc3b0f0145c94, type: 2}
   m_sharedMaterial: {fileID: 6521523841505961610, guid: bfa6fe600222ac84a9edc3b0f0145c94, type: 2}
@@ -1097,8 +1099,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1110,7 +1112,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 44.19
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0

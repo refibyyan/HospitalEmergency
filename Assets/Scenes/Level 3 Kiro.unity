@@ -407,9 +407,9 @@ MonoBehaviour:
   endingDisplay: {fileID: 1915649006}
   endingFadeCanvasGroup: {fileID: 1014012666}
   endingSlides:
-  - {fileID: -2507572987023252090, guid: 4f156ad7c3252b3418160a49034d9a6e, type: 3}
-  - {fileID: -3072889893477163947, guid: 9b0fe2dfc4a478f47b1667fd6f6d36e6, type: 3}
-  - {fileID: 5013836682901589610, guid: 768eacc2c8a946047aef36cd824212b8, type: 3}
+  - {fileID: -1659998343919288427, guid: f9ec7992aff569045a1974a45f9dc312, type: 3}
+  - {fileID: 7833971254731555846, guid: 302bcebb23e6db947af081dc4e684655, type: 3}
+  - {fileID: 7678082683467523950, guid: f4ef80bf05bf9994ba7fa7c5268f1b9e, type: 3}
   - {fileID: 3735283373846535806, guid: 7e654169b1df70646b328775d49911d1, type: 3}
   - {fileID: -5506817103470585509, guid: 54404fb810d5d4044bc704dbcef131bb, type: 3}
   - {fileID: 2939172346540421715, guid: a57dfdbfa6da2574ab242898693b32ac, type: 3}
@@ -3123,7 +3123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1be024be291e61a41815fa5ded44d09a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
-  esp32Input: {fileID: 0}
+  esp32Input: {fileID: 1691068003}
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
   player: {fileID: 1806290727}

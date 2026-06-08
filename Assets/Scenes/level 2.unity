@@ -2704,6 +2704,7 @@ MonoBehaviour:
   selectSFX: {fileID: 8300000, guid: 809a4b86bcb36b640a6bffdcc34b4be3, type: 3}
   confirmSFX: {fileID: 8300000, guid: 18bb04ce16cd9184f89e098595b0ff03, type: 3}
   timerSFX: {fileID: 8300000, guid: 4ec7e066f59f3c74898c2b4ad2d8fb46, type: 3}
+  sfx_Berhasil: {fileID: 8300000, guid: 9dc2d0010e8aca9488a3edb14ad6ff6d, type: 3}
   missionTimerAudioSource: {fileID: 487723351}
   missionTimerSFX: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
 --- !u!4 &487723350
@@ -10720,7 +10721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155d76c31cbef2e47ac7c7d84c9c66a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  esp32Input: {fileID: 0}
+  esp32Input: {fileID: 1336845849}
   fadeImage: {fileID: 1987053894}
   fadeDuration: 3
   dialogueBox: {fileID: 1231065540}

@@ -2704,6 +2704,7 @@ MonoBehaviour:
   selectSFX: {fileID: 8300000, guid: 809a4b86bcb36b640a6bffdcc34b4be3, type: 3}
   confirmSFX: {fileID: 8300000, guid: d4036f5688cab3b45a7c8d4c8806956f, type: 3}
   timerSFX: {fileID: 8300000, guid: 4ec7e066f59f3c74898c2b4ad2d8fb46, type: 3}
+  sfx_Berhasil: {fileID: 8300000, guid: 9dc2d0010e8aca9488a3edb14ad6ff6d, type: 3}
   missionTimerAudioSource: {fileID: 487723351}
   missionTimerSFX: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
 --- !u!4 &487723350

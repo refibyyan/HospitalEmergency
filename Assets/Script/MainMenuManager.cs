@@ -38,13 +38,14 @@ public class MainMenuManager : MonoBehaviour
     {
         if (startButton != null) startButton.Select();
 
+        // Diubah ke FindAnyObjectByType untuk menghilangkan warning obsolete
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
         if (tutorialManager == null)
         {
-            tutorialManager = FindFirstObjectByType<TutorialManager>();
+            tutorialManager = FindAnyObjectByType<TutorialManager>();
         }
     }
 
@@ -137,8 +138,7 @@ public class MainMenuManager : MonoBehaviour
                 PlaySFX(pressedSound);
                 if (isExitYesSelected)
                 {
-                    Debug.Log("Game Quit");
-                    Application.Quit();
+                    QuitGame();
                 }
                 else
                 {
@@ -230,5 +230,18 @@ public class MainMenuManager : MonoBehaviour
         if (exitPopUpObj != null) exitPopUpObj.SetActive(false);
         if (blurPanel != null) blurPanel.SetActive(false);
         if (exitButton != null) exitButton.Select();
+    }
+
+    void QuitGame()
+    {
+        Debug.Log("Game Quit");
+
+        // Mematikan play mode jika dijalankan di dalam Unity Editor
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+
+        // Menutup aplikasi game jika sudah di-build (.exe / android / dll)
+        Application.Quit();
     }
 }

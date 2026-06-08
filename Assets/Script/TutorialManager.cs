@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public partial class TutorialManager : MonoBehaviour
+public class TutorialManager : MonoBehaviour
 {
     [Header("ESP32 Input Reference")]
     public ESP32Input esp32Input; // Referensi untuk mendeteksi tombol ESP32
@@ -19,10 +19,10 @@ public partial class TutorialManager : MonoBehaviour
 
     void Start()
     {
-        // Otomatis cari ESP32Input jika lupa di-drag
+        // Diubah ke FindAnyObjectByType untuk menghilangkan warning obsolete
         if (esp32Input == null)
         {
-            esp32Input = FindFirstObjectByType<ESP32Input>();
+            esp32Input = FindAnyObjectByType<ESP32Input>();
         }
     }
 
@@ -80,8 +80,8 @@ public partial class TutorialManager : MonoBehaviour
 
         isTutorialActive = false;
 
-        // Beritahu MainMenuManager kalau tutorial sudah ditutup
-        MainMenuManager mainMenu = FindFirstObjectByType<MainMenuManager>();
+        // Diubah ke FindAnyObjectByType untuk menghilangkan warning obsolete saat memanggil MainMenuManager
+        MainMenuManager mainMenu = FindAnyObjectByType<MainMenuManager>();
         if (mainMenu != null)
         {
             mainMenu.CloseTutorialPopUp();

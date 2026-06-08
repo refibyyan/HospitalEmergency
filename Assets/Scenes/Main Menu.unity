@@ -1110,8 +1110,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40ec9a31c2fede74385a51d74bd0262e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
-  esp32Input: {fileID: 0}
-  tutorialManager: {fileID: 0}
+  esp32Input: {fileID: 1902508168}
+  tutorialManager: {fileID: 981577274}
   startButton: {fileID: 1785599729}
   tutorialButton: {fileID: 1939705672}
   exitButton: {fileID: 1789029095}
@@ -1150,7 +1150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 691caac6156256a4fb1fb53ceb365c41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
-  esp32Input: {fileID: 0}
+  esp32Input: {fileID: 1902508168}
   blurPanel: {fileID: 1955040759}
   choicePopUp: {fileID: 313043081}
   movementPopUp: {fileID: 1995659683}

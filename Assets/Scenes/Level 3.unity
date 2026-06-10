@@ -388,7 +388,7 @@ MonoBehaviour:
   fadeDuration: 3
   popUpCanvasGroup: {fileID: 1939926038}
   timerText: {fileID: 696068086}
-  startingTime: 30
+  startingTime: 50
   timerHasStarted: 0
   audioSource: {fileID: 28775280}
   sfxTimerStart: {fileID: 8300000, guid: 61302850d06dc4647b89987286994137, type: 3}
@@ -707,10 +707,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
   esp32Input: {fileID: 0}
+  player: {fileID: 135987315}
+  playerMovement: {fileID: 0}
+  triggerDistance: 3
+  causeFreeze: 0
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
-  player: {fileID: 135987315}
-  triggerDistance: 3
   breakSound: {fileID: 8300000, guid: 48366341b0c24dd4cbfac46ce514875c, type: 3}
   dialogueBox: {fileID: 0}
   dialogueTMP: {fileID: 0}
@@ -1048,10 +1050,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
   esp32Input: {fileID: 0}
+  player: {fileID: 135987315}
+  playerMovement: {fileID: 0}
+  triggerDistance: 3
+  causeFreeze: 0
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
-  player: {fileID: 135987315}
-  triggerDistance: 3
   breakSound: {fileID: 8300000, guid: 48366341b0c24dd4cbfac46ce514875c, type: 3}
   dialogueBox: {fileID: 0}
   dialogueTMP: {fileID: 0}
@@ -3486,10 +3490,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
   esp32Input: {fileID: 0}
+  player: {fileID: 135987315}
+  playerMovement: {fileID: 2022825992}
+  triggerDistance: 3
+  causeFreeze: 1
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
-  player: {fileID: 135987315}
-  triggerDistance: 3
   breakSound: {fileID: 8300000, guid: 48366341b0c24dd4cbfac46ce514875c, type: 3}
   dialogueBox: {fileID: 1559546872}
   dialogueTMP: {fileID: 225380824}
@@ -7728,10 +7734,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
   esp32Input: {fileID: 0}
+  player: {fileID: 135987315}
+  playerMovement: {fileID: 0}
+  triggerDistance: 3
+  causeFreeze: 0
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
-  player: {fileID: 135987315}
-  triggerDistance: 3
   breakSound: {fileID: 8300000, guid: 48366341b0c24dd4cbfac46ce514875c, type: 3}
   dialogueBox: {fileID: 0}
   dialogueTMP: {fileID: 0}
@@ -8946,10 +8954,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PotFall
   esp32Input: {fileID: 0}
+  player: {fileID: 135987315}
+  playerMovement: {fileID: 0}
+  triggerDistance: 3
+  causeFreeze: 0
   standingSprite: {fileID: -2014518629615138023, guid: 8bf35559a0ba66e49865e9d112cf7bab, type: 3}
   fallenSprite: {fileID: 7452622166835271133, guid: 822106258f3051b41b5ad04c0ca8de47, type: 3}
-  player: {fileID: 135987315}
-  triggerDistance: 3
   breakSound: {fileID: 8300000, guid: 48366341b0c24dd4cbfac46ce514875c, type: 3}
   dialogueBox: {fileID: 0}
   dialogueTMP: {fileID: 0}
@@ -11486,6 +11496,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2049245820}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: moveSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
       objectReference: {fileID: 8300000, guid: 26816313565c7514aa7e77826774b3b4, type: 3}
@@ -11519,6 +11533,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 278d35abccd81874493a3e9dc592d793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2022825992 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2317503597918140618, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+  m_PrefabInstance: {fileID: 2022825990}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135987309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!82 &2022825996

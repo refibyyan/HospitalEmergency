@@ -7,6 +7,9 @@ public class DialogManager : MonoBehaviour
     [Header("--- ESP32 INPUT REFERENCE ---")]
     public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
 
+    [Header("--- PLAYER REFERENCE ---")]
+    public MonoBehaviour playerMovement; // Drag script PlayerMovement/PlayerController Anda ke sini
+
     [Header("UI Elemen")]
     public GameObject dialogBox;
     public TextMeshProUGUI textMeshPro;
@@ -32,8 +35,20 @@ public class DialogManager : MonoBehaviour
         // Otomatis mencari script ESP32Input di hierarki jika belum di-drag manual
         if (esp32Input == null)
         {
-            // Diubah ke FindAnyObjectByType untuk menghindari warning obsolete
             esp32Input = FindAnyObjectByType<ESP32Input>();
+        }
+
+        // Otomatis mencari PlayerMovement di scene jika lupa di-drag
+        if (playerMovement == null)
+        {
+            // Mencari objek bernama "PlayerMovement", sesuaikan tipe jika class Anda spesifik (misal: PlayerMovement)
+            // Di sini menggunakan MonoBehaviour umum agar fleksibel
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                // Coba cari komponen pergerakan di objek ber-tag Player
+                playerMovement = player.GetComponent<MonoBehaviour>(); 
+            }
         }
 
         StartCoroutine(WaitBeforeStart());
@@ -53,6 +68,9 @@ public class DialogManager : MonoBehaviour
         if (dialogBox != null) dialogBox.SetActive(true);
         index = 0;
         isDialogActive = true;
+
+        // 🛑 FREEZE PLAYER: Matikan pergerakan saat dialog dimulai
+        FreezePlayer(true);
 
         typingCoroutine = StartCoroutine(TypeLine());
     }
@@ -127,6 +145,9 @@ public class DialogManager : MonoBehaviour
             textMeshPro.text = "";
             isDialogActive = false;
 
+            // 🏃‍♂️ UNFREEZE PLAYER: Aktifkan kembali pergerakan saat dialog selesai
+            FreezePlayer(false);
+
             Debug.Log("Dialog Selesai! Pemain sekarang bisa jalan.");
         }
     }
@@ -137,6 +158,31 @@ public class DialogManager : MonoBehaviour
         if (typingSource != null && typingSource.isPlaying)
         {
             typingSource.Stop();
+        }
+    }
+
+    // 🛑 Fungsi untuk membekukan/melepas kontrol pergerakan player
+    void FreezePlayer(bool freeze)
+    {
+        if (playerMovement != null)
+        {
+            // Menonaktifkan script pergerakan agar fungsi Update()/FixedUpdate() di dalamnya berhenti
+            playerMovement.enabled = !freeze;
+
+            // Memaksa Rigidbody/Rigidbody2D berhenti seketika agar tidak meluncur
+            Rigidbody rb = playerMovement.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero; // Menggunakan .linearVelocity untuk Unity versi baru, atau .velocity jika versi lama
+            }
+            else
+            {
+                Rigidbody2D rb2d = playerMovement.GetComponent<Rigidbody2D>();
+                if (rb2d != null)
+                {
+                    rb2d.linearVelocity = Vector2.zero;
+                }
+            }
         }
     }
 }

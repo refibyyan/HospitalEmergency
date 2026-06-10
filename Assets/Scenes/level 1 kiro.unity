@@ -3769,6 +3769,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1332241401}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: moveSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
       objectReference: {fileID: 8300000, guid: 26816313565c7514aa7e77826774b3b4, type: 3}
@@ -6468,6 +6472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
   esp32Input: {fileID: 1332241401}
+  playerMovement: {fileID: 1595006241}
   dialogBox: {fileID: 1364066614}
   textMeshPro: {fileID: 911948278}
   typingSpeed: 0.07

@@ -23,13 +23,18 @@ public class PotFall : MonoBehaviour
     [Header("--- ESP32 INPUT REFERENCE ---")]
     public ESP32Input esp32Input; // Drag GameObject ESP32Input ke sini di Inspector
 
+    [Header("--- PLAYER & MOVEMENT REFERENCE ---")]
+    public Transform player;
+    public MonoBehaviour playerMovement; // Drag script PlayerMovement/PlayerController Anda ke sini
+    public float triggerDistance = 2f;
+
+    [Header("--- FREEZE SETTING ---")]
+    [Tooltip("Centang ini HANYA pada pot pertama yang ingin membuat player nge-freeze saat dialog.")]
+    public bool causeFreeze = false; 
+
     [Header("Sprite")]
     public Sprite standingSprite;
     public Sprite fallenSprite;
-
-    [Header("Player")]
-    public Transform player;
-    public float triggerDistance = 2f;
 
     [Header("Pot SFX")]
     public AudioClip breakSound;
@@ -85,6 +90,12 @@ public class PotFall : MonoBehaviour
         if (esp32Input == null)
         {
             esp32Input = FindFirstObjectByType<ESP32Input>();
+        }
+
+        // Otomatis mencari script pergerakan di objek Player jika lupa di-drag
+        if (playerMovement == null && player != null)
+        {
+            playerMovement = player.GetComponent<MonoBehaviour>();
         }
     }
 
@@ -166,12 +177,19 @@ public class PotFall : MonoBehaviour
         if (dialogueBox != null)
             dialogueBox.SetActive(true);
 
-        // mulai sistem dialog baru
         isDialoguePlaying = true;
+
+        // 🛑 FREEZE PLAYER: Hanya nge-freeze jika 'causeFreeze' dicentang true di Inspector
+        if (causeFreeze)
+        {
+            FreezePlayer(true);
+        }
+        
         currentIndex = 0;
 
         typingCoroutine = StartCoroutine(TypeWriter(potDialogues[currentIndex]));
 
+        // Tunggu sampai dialog benar-benar berakhir
         yield return new WaitUntil(() => !isDialoguePlaying);
 
         if (dialogueBox != null)
@@ -198,6 +216,12 @@ public class PotFall : MonoBehaviour
     void EndDialogue()
     {
         isDialoguePlaying = false;
+        
+        // 🏃‍♂️ UNFREEZE PLAYER: Hanya dilepas jika sebelumnya pot ini yang mengunci pergerakan
+        if (causeFreeze)
+        {
+            FreezePlayer(false);
+        }
     }
 
     IEnumerator TypeWriter(PotDialogue data)
@@ -244,5 +268,27 @@ public class PotFall : MonoBehaviour
 
         if (playerNameTMP != null)
             playerNameTMP.text = data.playerName;
+    }
+
+    void FreezePlayer(bool freeze)
+    {
+        if (playerMovement != null)
+        {
+            playerMovement.enabled = !freeze;
+
+            Rigidbody2D rb2d = playerMovement.GetComponent<Rigidbody2D>();
+            if (rb2d != null)
+            {
+                rb2d.linearVelocity = Vector2.zero;
+            }
+            else
+            {
+                Rigidbody rb = playerMovement.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                }
+            }
+        }
     }
 }

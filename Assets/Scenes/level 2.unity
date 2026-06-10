@@ -2699,7 +2699,7 @@ MonoBehaviour:
   timerDuration: 15
   timerTemplate: {fileID: 2062993689}
   timerText: {fileID: 157017004}
-  missionTimerDuration: 30
+  missionTimerDuration: 60
   audioSource: {fileID: 487723351}
   selectSFX: {fileID: 8300000, guid: 809a4b86bcb36b640a6bffdcc34b4be3, type: 3}
   confirmSFX: {fileID: 8300000, guid: 18bb04ce16cd9184f89e098595b0ff03, type: 3}
@@ -8570,6 +8570,10 @@ PrefabInstance:
       propertyPath: espInput
       value: 
       objectReference: {fileID: 1336845849}
+    - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
+      propertyPath: moveSpeed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 9198774304446282571, guid: 0a9ae5c98d2745a4f8a73d6672e79647, type: 3}
       propertyPath: derapLangkah
       value: 
